@@ -109,14 +109,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-
-	  if(mode==1)
-	  {
-		  HAL_UART_Transmit(&huart1, (uint8_t*)data, sizeof(data), HAL_MAX_DELAY);
-		  HAL_Delay(100);
-		  mode=0;
-	  }
+	HAL_UART_Transmit(&huart1, (uint8_t*)data, sizeof(data), HAL_MAX_DELAY);
+	//HAL_Delay(1000);
+	for(uint32_t i=0;i<9000000;i++);
   }
   /* USER CODE END 3 */
 }

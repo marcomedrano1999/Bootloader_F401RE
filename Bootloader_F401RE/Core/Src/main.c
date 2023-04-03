@@ -61,8 +61,16 @@ static void MX_USART1_UART_Init(void);
 static void MX_CRC_Init(void);
 /* USER CODE BEGIN PFP */
 
+#define BL_RX_LEN		200
+uint8_t bl_rx_buffer[BL_RX_LEN];
+
+#define C_UART	&huart2
+
 char data[] = "Hola!\r\n";
 static void printmsg(char *format, ...);
+
+/* Supported commands */
+uint8_t supported_cmds[] = {BL_GET_VER,BL_GET_HELP,BL_GET_CID,BL_GET_RDP_STATUS,BL_GO_TO_ADDR,BL_FLASH_ERASE,BL_MEM_WRITE,BL_EN_R_W_PROTECT,BL_MEM_READ,BL_READ_SECTOR_STATUS,BL_OTP_READ,BL_DIS_R_W_PROTECT};
 
 
 /* USER CODE END PFP */
@@ -309,6 +317,70 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 
+void bootloader_send_ack(uint8_t command_code, uint8_t follow_len)
+{
+	//Here we send 2 bytes. First byte is ack and second byte is len value
+	uint8_t ack_buf[2];
+	ack_buf[0] = BL_ACK;
+	ack_buf[1] = follow_len;
+	HAL_UART_Transmit(C_UART, ack_buf, 2, HAL_MAX_DELAY);
+}
+
+void bootloader_send_nack(void)
+{
+	uint8_t nack = BL_NACK;
+	HAL_UART_Transmit(C_UART, &nack, 1, HAL_MAX_DELAY);
+}
+
+
+uint8_t bootloader_verify_crc(uint8_t* pData, uint32_t len, uint32_t crc_host)
+{
+	uint32_t uwCRCValue = 0xFF;
+
+	// Cleans the CRC calculation unit
+	__HAL_CRC_DR_RESET(&hcrc);
+
+	for(uint32_t i=0; i<len; i++)
+	{
+		uint32_t i_data = pData[i];
+		uwCRCValue = HAL_CRC_Accumulate(&hcrc, &i_data, 1);
+	}
+	printmsg("BL_DEBUG_MSG: CRC received: %#x	CRC computed: %#x\r\n",crc_host,uwCRCValue);
+
+
+	if(uwCRCValue == crc_host)
+	{
+		return VERIFY_CRC_SUCCESS;
+	}
+
+	return VERIFY_CRC_FAIL;
+}
+
+
+uint8_t get_bootloader_version(void)
+{
+	return (uint8_t)BL_VERSION;
+}
+
+
+uint16_t get_mcu_chip_id(void)
+{
+	/*  The STM32F446xx MCUs integrate an MCU ID code. This ID identifies the ST MCU partnumber
+	 *  and the die revision. It is part of the DBG_MCU component and is mapped on the
+	 *  external PPB bus (see Section 33.16 on page 1304). This code is accessible using the
+	 *  JTAG debug pCat.2ort (4 to 5 pins) or the SW debug port (two pins) or by the user software
+	 *  It is even accessible while the MECU is under system reset.
+	 */
+	uint16_t cid = (uint16_t)(DBGMCU->IDCODE)&0x0FFF;
+	return cid;
+}
+
+
+void bootloader_uart_write_data(uint8_t *pBuffer, uint32_t len)
+{
+	HAL_UART_Transmit(C_UART,pBuffer,len,HAL_MAX_DELAY);
+}
+
 
 void printmsg(char *format, ...)
 {
@@ -327,14 +399,221 @@ void printmsg(char *format, ...)
 
 void bootloader_uart_read_data(void)
 {
+	uint8_t rcv_len = 0;
+
+	while(1)
+	{
+		// Clean array
+		memset(bl_rx_buffer,0,200);
+
+
+		//Here we'll read and decode the commands coming from host
+		//First read only one byte from the host, which is the "length" field of the command
+		HAL_UART_Receive(C_UART,bl_rx_buffer,1,HAL_MAX_DELAY);
+		rcv_len=bl_rx_buffer[0];
+
+		// Read the command and the rest of the message
+		HAL_UART_Receive(C_UART,&bl_rx_buffer[1],rcv_len,HAL_MAX_DELAY);
+		//printmsg("BL_DEBUG_MSG: Command received: %#x\r\n",bl_rx_buffer[1]);
+		switch(bl_rx_buffer[1])
+		{
+			case BL_GET_VER:
+				bootloader_handle_getver_cmd(bl_rx_buffer);
+				break;
+			case BL_GET_HELP:
+				bootloader_handle_gethelp_cmd(bl_rx_buffer);
+				break;
+			case BL_GET_CID:
+				bootloader_handle_getcid_cmd(bl_rx_buffer);
+				break;
+			case BL_GET_RDP_STATUS:
+				bootloader_handle_getrdp_cmd(bl_rx_buffer);
+				break;
+			case BL_GO_TO_ADDR:
+				bootloader_handle_go_cmd(bl_rx_buffer);
+				break;
+			case BL_FLASH_ERASE:
+				bootloader_handle_flash_erase_cmd(bl_rx_buffer);
+				break;
+			case BL_MEM_WRITE:
+				bootloader_handle_mem_write_cmd(bl_rx_buffer);
+				break;
+			case BL_EN_R_W_PROTECT:
+				bootloader_handle_endis_rw_protect_cmd(bl_rx_buffer);
+				break;
+			case BL_MEM_READ:
+				bootloader_handle_mem_read_cmd(bl_rx_buffer);
+				break;
+			case BL_READ_SECTOR_STATUS:
+				bootloader_handle_read_sector_status_cmd(bl_rx_buffer);
+				break;
+			case BL_OTP_READ:
+				bootloader_handle_otp_read_cmd(bl_rx_buffer);
+				break;
+			case BL_DIS_R_W_PROTECT:
+				bootloader_handle_dis_r_w_protect_cmd(bl_rx_buffer);
+				break;
+			default:
+				printmsg("BL_DEBUG_MSG:Invalid command code received from host\r\n");
+				break;
+		}
+	}
 
 }
 
 
+void bootloader_handle_getver_cmd(uint8_t *bl_rx_buffer)
+{
+	uint8_t bl_version;
+
+	// 1) verify the checksum
+	printmsg("BL_DEBUG_MSG:bootloader_handle_getver_cmd\r\n");
+
+	// Total lenght of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len - 4));
+
+	if(!bootloader_verify_crc(&bl_rx_buffer[0],command_packet_len-4,host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		// checksum is correct...
+		bootloader_send_ack(bl_rx_buffer[0],1);
+		bl_version=get_bootloader_version();
+		printmsg("BL_DEBUG_MSG:BL_VER : %d %#x\r\n",bl_version,bl_version);
+		bootloader_uart_write_data(&bl_version,1);
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\r\n");
+		// checksum is wrong send NACK
+		bootloader_send_nack();
+	}
+}
+
+void bootloader_handle_gethelp_cmd(uint8_t *bl_rx_buffer)
+{
+	printmsg("BL_DEBUG_MSG::bootloader_handle_gethelp_cmd\r\n");
+
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],sizeof(supported_cmds));
+		bootloader_uart_write_data(supported_cmds, sizeof(supported_cmds));
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
+}
+
+void bootloader_handle_getcid_cmd(uint8_t *bl_rx_buffer)
+{
+	printmsg("BL_DEBUG_MSG::bootloader_handle_getcid_cmd\r\n");
+
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],2);
+		uint16_t bl_cid_num = get_mcu_chip_id();
+		printmsg("BL_DEBUG_MSG:MCU id: %d %#x\r\n",bl_cid_num,bl_cid_num);
+		bootloader_uart_write_data(((uint8_t*)&bl_cid_num), 2);
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
+}
+
+void bootloader_handle_getrdp_cmd(uint8_t *bl_rx_buffer)
+{
+
+}
+
+void bootloader_handle_go_cmd(uint8_t *bl_rx_buffer)
+{
+
+}
+
+void bootloader_handle_flash_erase_cmd(uint8_t *bl_rx_buffer)
+{
+
+}
+
+void bootloader_handle_mem_write_cmd(uint8_t *bl_rx_buffer)
+{
+
+}
+
+void bootloader_handle_endis_rw_protect_cmd(uint8_t *bl_rx_buffer)
+{
+
+}
+
+void bootloader_handle_mem_read_cmd(uint8_t *bl_rx_buffer)
+{
+
+}
+
+void bootloader_handle_read_sector_status_cmd(uint8_t *bl_rx_buffer)
+{
+
+}
+
+void bootloader_handle_otp_read_cmd(uint8_t *bl_rx_buffer)
+{
+
+}
+
+void bootloader_handle_dis_r_w_protect_cmd(uint8_t *bl_rx_buffer)
+{
+
+}
+
 
 void bootloader_jump_to_user_app(void)
 {
+	// Just a function pointer to hold the address of the reset handler of the user app
+	void (*app_reset_handler)(void);
 
+	printmsg("BL_DEBUG_MSG:bootloader_jump_to_user_app\r\n");
+
+	// 1. Configure the MSP by reading the value from the base address of the sector 2
+	uint32_t msp_value = *(volatile uint32_t *)FLASH_SECTOR_2_BASE_ADDRESS;
+	printmsg("BL_DEBUG_MSG:MSP value : %#x\r\n",msp_value);
+
+	// This function comes from CMSIS
+	__set_MSP(msp_value);
+
+	//scb->VTOR = FLASH_SECTOR1_BASE_ADDRESS
+
+
+	// 2. Now fetch the reset handler address of the user application
+	//	  from the location FLASH_SECTOR2_BASE_ADDRESS+4
+	uint32_t resethandler_address = *(volatile uint32_t*)(FLASH_SECTOR_2_BASE_ADDRESS+4);
+
+	app_reset_handler = (void*)resethandler_address;
+
+	printmsg("BL_DEBUG_MSG: app reset handler addr: %#x\r\n",app_reset_handler);
+
+
+	// 3. Jump to reset handler of the user application
+	app_reset_handler();
 }
 
 /* USER CODE END 4 */
