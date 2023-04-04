@@ -375,6 +375,239 @@ uint16_t get_mcu_chip_id(void)
 	return cid;
 }
 
+uint8_t get_flash_rdp_level(void)
+{
+	uint8_t rdp_status = 0;
+
+#if 1
+	FLASH_OBProgramInitTypeDef ob_handle;
+	HAL_FLASHEx_OBGetConfig(&ob_handle);
+	rdp_status = (uint8_t) ob_handle.RDPLevel;
+
+#else
+	// Read Flash options bytes array
+	volatile uint32_t *pOB_addr = (uint32_t*) 0x1FFFC000;
+	rdp_status = (uint8_t)(*pOB_addr >> 8);
+#endif
+	return rdp_status;
+}
+
+uint8_t verify_address(uint32_t go_address)
+{
+	/* What are the valid addresses to which we can jump
+	 * - System memory
+	 * - SRAM1 memory
+	 * - SRAM2 memory
+	 * - backup SRAM memory
+	 * - external memory
+	 */
+
+
+	if(SRAM1_BASE <= go_address && go_address <= SRAM1_END)
+	{
+		return ADDR_VALID;
+	}
+#ifdef SRAM2_BASE
+	else if(SRAM2_BASE <= go_address && go_address <= SRAM2_END)
+	{
+		return ADDR_VALID;
+	}
+#endif
+	else if(FLASH_BASE <= go_address && go_address <= FLASH_END)
+	{
+		return ADDR_VALID;
+	}
+#ifdef BKPSRAM_BASE
+	else if(BKPSRAM_BASE <= go_address && go_address <= BKPSRAM_END)
+	{
+		return ADDR_VALID;
+	}
+#endif
+	else
+	{
+		return ADDR_INVALID;
+	}
+}
+
+uint8_t execute_flash_erase(uint8_t sector_number, uint8_t no_of_sector)
+{
+
+	HAL_StatusTypeDef status;
+	FLASH_EraseInitTypeDef flash_erase_handle;
+	uint32_t sectorerror;
+
+	/* We have 8 sectors in STM32F401RE MCU ... sector[0 to 7]
+	 * no_of_sector has to be in the range of 0 to 7
+	 * if sector_number = 0xff, that means mass erase
+	 */
+
+
+	if(no_of_sector > 8)
+		return INVALID_SECTOR;
+
+	if((sector_number == 0xff) || (sector_number <= 7))
+	{
+		// mass erase
+		if(sector_number == (uint8_t) 0xff)
+		{
+			flash_erase_handle.TypeErase = FLASH_TYPEERASE_MASSERASE;
+		}
+		// sector erase
+		else
+		{
+			uint8_t remaining_sector = 8-sector_number;
+			if(no_of_sector > remaining_sector)
+			{
+				no_of_sector = remaining_sector;
+			}
+			flash_erase_handle.TypeErase = FLASH_TYPEERASE_SECTORS;
+			flash_erase_handle.Sector = sector_number;		// This is the initial sector
+			flash_erase_handle.NbSectors = no_of_sector;
+		}
+
+		flash_erase_handle.Banks = FLASH_BANK_1;
+
+		// Get access to touch the flash registers
+		HAL_FLASH_Unlock();
+		flash_erase_handle.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+		status = (uint8_t) HAL_FLASHEx_Erase(&flash_erase_handle, &sectorerror);
+		HAL_FLASH_Lock();
+
+		return status;
+	}
+
+
+	return INVALID_SECTOR;
+}
+
+
+/* This function writes the contents of pBuffer to "mem_address" byte by byte
+ *
+ * Note1: Currently this function supports writing to Flash only
+ * Note2: This functions does not check whether "mem_address" is a valid address of the MCU
+ */
+uint8_t execute_mem_write(uint8_t *pBuffer, uint32_t mem_address, uint32_t len)
+{
+	uint8_t status = HAL_OK;
+
+	// We have to unlock flash module to get control of the registers
+	HAL_FLASH_Unlock();
+
+	for(uint32_t i = 0; i < len; i++)
+	{
+		// Here we program the flash byte by byte
+		status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, mem_address+i, pBuffer[i]);
+	}
+
+	HAL_FLASH_Lock();
+
+	return status;
+}
+
+/* Modifying user option bytes
+ * To modify the user option value, follow the sequence below:
+ * 1. Check that no Flash memory operation is ongoing by checking the BSY bit
+ * 	  in the FLASH_SR register
+ * 2. Write the desired option value in the FLASH_OPTCR register
+ * 3. Set the option start bit (OPTSTRT) in the FLASH_OPTCR register
+ * 4. Wait got the BSY bit to be cleared
+ *
+ */
+uint8_t configure_flash_sector_rw_protection(uint8_t sector_details, uint8_t protection_mode, uint8_t disable)
+{
+	/*
+	 * First configure the protection mode
+	 * protection_mode=1, means write protect of the user flash sectors
+	 * protection_mode=2, means read/write protect of the user flash sectors
+	 * According to RM of stm32f401 TABLE 9, we have to modify the address
+	 *  0x1FFF c008 bit 15 (SPRMOD)
+	 */
+
+	// Flash option control register (OPTCR)
+	volatile uint32_t *pOPTCR = (uint32_t*)0x40023C14;
+
+	if(disable)
+	{
+		//disable all r/w protection on sectors
+
+		//option byte configuration unlock
+		HAL_FLASH_OB_Unlock();
+
+		//wait till no active operation on flash
+		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+
+		//clear the 31st bit (default state)
+		//please refer: flash option control register (FLASH_OPTCR) in user manual
+		*pOPTCR &= ~(1 << 31);
+
+		//clear the protection: make all bits belonging to sectos as
+		*pOPTCR |= (0xFF << 16);
+
+		//set the option start bit (OPTSTRT) in the FLASH_OPTCR register
+		*pOPTCR |= (1 << 1);
+
+		//wait till no active operation on flash
+		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+
+		HAL_FLASH_OB_Lock();
+
+		return 0;
+	}
+
+	if(protection_mode == (uint8_t)1)
+	{
+		//Option byte configuration unlock
+		HAL_FLASH_OB_Unlock();
+
+		//wait till no active operation on flash
+		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY)!=RESET);
+
+		//here we are setting just write protection for the sectors
+		//clear the 31th bit
+		//please refer: FLASH option control register (FLASH_OPTCR) in RM
+		*pOPTCR &= ~(1 << 31);
+
+		//put write protection on sectors
+		*pOPTCR &= ~(sector_details << 16);
+
+		//Set the option start bit (OPTSTRT) in the FLASH_OPTCR register
+		*pOPTCR |= (1 << 1);
+
+		//wait till no active operation on flash
+		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY)!=RESET);
+
+		HAL_FLASH_OB_Lock();
+	}
+	else if(protection_mode == (uint8_t)2)
+	{
+		//option byte configuration unlock
+		HAL_FLASH_OB_Unlock();
+
+		//wait till no active operation on flash
+		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+
+		//here we are setting read and write protection for the sectors
+		//set the 31th bit
+		//please refer: Flash option control register (FLASH_OPTCR) in RM
+		*pOPTCR |= (1 << 31);
+
+		//put read and write protection on sectors
+		*pOPTCR &= ~(0xff << 16);
+		*pOPTCR |= (sector_details << 16);
+
+		//set the option start bit (OPTSTRT) in the FLASH_OPTCR register
+		*pOPTCR |= (1 << 1);
+
+		//wait till no active operation on flash
+		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+
+		HAL_FLASH_OB_Lock();
+	}
+
+	return 0;
+}
+
+
 
 void bootloader_uart_write_data(uint8_t *pBuffer, uint32_t len)
 {
@@ -542,27 +775,208 @@ void bootloader_handle_getcid_cmd(uint8_t *bl_rx_buffer)
 
 void bootloader_handle_getrdp_cmd(uint8_t *bl_rx_buffer)
 {
+	printmsg("BL_DEBUG_MSG::bootloader_handle_getrdp_cmd\r\n");
 
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],2);
+		uint8_t rdp_level = get_flash_rdp_level();
+		printmsg("BL_DEBUG_MSG:RDP level: %d %#x\r\n",rdp_level,rdp_level);
+		bootloader_uart_write_data(((uint8_t*)&rdp_level), 1);
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
 }
 
 void bootloader_handle_go_cmd(uint8_t *bl_rx_buffer)
 {
 
+	uint32_t go_address = 0;
+	uint8_t addr_valid = ADDR_VALID;
+	uint8_t addr_invalid = ADDR_INVALID;
+
+	printmsg("BL_DEBUG_MSG::bootloader_handle_go_cmd\r\n");
+
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],2);
+
+		//Extract the go address
+		go_address = *((uint32_t *)&bl_rx_buffer[2]);
+		printmsg("BL_DEBUG_MSG:GO addr: %#x\r\n",go_address);
+
+		if(verify_address(go_address) == ADDR_VALID)
+		{
+			// tell the host that address is fine
+			bootloader_uart_write_data(&addr_valid,1);
+
+			/* Jump to "go" address.
+			 *  We don't care what is being done there. Host must ensure that valid code is present over there
+			 *  It is not bootloader's duty, so just trust and jump
+			 */
+
+			/* Not doing the below line will result in hardfault exception for ARM cortex M */
+			//watch: https://www.youtube.com/watch?v=VX_12SjnNhY
+			go_address|=1; //Make T bit = 1
+
+			void (*lets_jump)(void) = (void*)go_address;
+
+			printmsg("BL_DEBUG_MSG: jumping to go address!\r\n");
+
+			lets_jump();
+		}
+		else
+		{
+			printmsg("BL_DEBUG_MSG: GO address invalid!\r\n");
+
+			// tell host that address is invalid
+			bootloader_uart_write_data(&addr_invalid,1);
+		}
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
 }
 
 void bootloader_handle_flash_erase_cmd(uint8_t *bl_rx_buffer)
 {
+	uint8_t erase_status = 0x00;
+
+	printmsg("BL_DEBUG_MSG::bootloader_handle_flash_erase_cmd\r\n");
+
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],2);
+
+
+		printmsg("BL_DEBUG_MSG:Initial sector: %d   no_of_sectors: %d\r\n",bl_rx_buffer[2],bl_rx_buffer[3]);
+
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+		erase_status = execute_flash_erase(bl_rx_buffer[2],bl_rx_buffer[3]);
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+
+		printmsg("BL_DEBUG_MSG:Flash erase status: %#x\r\n",erase_status);
+		bootloader_uart_write_data(((uint8_t*)&erase_status), 1);
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
 
 }
 
 void bootloader_handle_mem_write_cmd(uint8_t *bl_rx_buffer)
 {
+	uint8_t addr_valid = ADDR_VALID;
+	uint8_t write_status = 0x00;
+	uint8_t chksum = 0;
+	uint8_t len = bl_rx_buffer[0];
+	uint8_t payload_len = bl_rx_buffer[6];
 
+	uint32_t mem_address = *((uint32_t *)(&bl_rx_buffer[2]));
+
+	chksum = bl_rx_buffer[len];
+
+	printmsg("BL_DEBUG_MSG::bootloader_handle_mem_write_cmd\r\n");
+
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],2);
+
+		printmsg("BL_DEBUG_MSG: mem write address: %#x\r\n",mem_address);
+
+		if(verify_address(mem_address) == ADDR_VALID)
+		{
+			printmsg("BL_DEBUG_MSG: valid mem write address\r\n");
+
+			// glow the led to indicate bootloader is currently writing to memory
+			HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,GPIO_PIN_SET);
+
+			// execute mem write
+			write_status = execute_mem_write(&bl_rx_buffer[7],mem_address,payload_len);
+
+			// turn off the led to indicate bootloader finished writing to memory
+			HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,GPIO_PIN_RESET);
+
+			printmsg("BL_DEBUG_MSG:Write status: %#x\r\n",write_status);
+			bootloader_uart_write_data(((uint8_t*)&write_status), 1);
+		}
+		else
+		{
+			printmsg("BL_DEBUG_MSG: invalid mem write address\r\n");
+			write_status = ADDR_INVALID;
+			//inform host that address is invalid
+			bootloader_uart_write_data(&write_status, 1);
+		}
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
 }
 
 void bootloader_handle_endis_rw_protect_cmd(uint8_t *bl_rx_buffer)
 {
+	uint8_t status = 0x00;
+	printmsg("BL_DEBUG_MSG::bootloader_handle_endis_rw_protect_cmd\r\n");
 
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],1);
+
+		status = configure_flash_sector_rw_protection(bl_rx_buffer[2],bl_rx_buffer[3],0);
+
+		printmsg("BL_DEBUG_MSG: flash erase status: %#x\n",status);
+
+		bootloader_uart_write_data(((uint8_t*)&status), 1);
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
 }
 
 void bootloader_handle_mem_read_cmd(uint8_t *bl_rx_buffer)
@@ -582,7 +996,31 @@ void bootloader_handle_otp_read_cmd(uint8_t *bl_rx_buffer)
 
 void bootloader_handle_dis_r_w_protect_cmd(uint8_t *bl_rx_buffer)
 {
+	uint8_t status = 0x00;
+	printmsg("BL_DEBUG_MSG::bootloader_handle_dis_rw_protect_cmd\r\n");
 
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],1);
+
+		status = configure_flash_sector_rw_protection(0,0,1);
+
+		printmsg("BL_DEBUG_MSG: flash erase status: %#x\n",status);
+
+		bootloader_uart_write_data(((uint8_t*)&status), 1);
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
 }
 
 

@@ -52,6 +52,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 Bootloader_F401RE_APP.list \
 
+OBJCOPY_BIN += \
+Bootloader_F401RE_APP.bin \
+
 
 # All Target
 all: main-build
@@ -75,12 +78,17 @@ Bootloader_F401RE_APP.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL
 	@echo 'Finished building: $@'
 	@echo ' '
 
+Bootloader_F401RE_APP.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Bootloader_F401RE_APP.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) Bootloader_F401RE_APP.elf Bootloader_F401RE_APP.list Bootloader_F401RE_APP.map default.size.stdout
+	-$(RM) Bootloader_F401RE_APP.bin Bootloader_F401RE_APP.elf Bootloader_F401RE_APP.list Bootloader_F401RE_APP.map default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

@@ -411,7 +411,8 @@ def decode_menu_command_code(command):
         sector_num = int(sector_num, 16)
         if(sector_num != 0xff):
             nsec=int(input("\n   Enter number of sectors to erase(max 8) here :"))
-        
+        else:
+            nsec=7
         data_buf[2]= sector_num 
         data_buf[3]= nsec 
 

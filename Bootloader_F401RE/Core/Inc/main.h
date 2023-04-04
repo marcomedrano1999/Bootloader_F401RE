@@ -81,6 +81,21 @@ void Error_Handler(void);
 #define BL_VERSION			0x10
 
 
+/* Memory macros */
+#define SRAM1_SIZE				(96*1024)	//STM32F401RE has 96 KB of SRAM
+#define SRAM1_END				(SRAM1_BASE+SRAM1_SIZE)
+#define SRAM2_SIZE				0	// STM32F401RE does not have second SRAM
+#define SRAM2_END				0	// STM32F401RE does not have second SRAM
+#define FLASH_SIZE				(512*1024)	//STM32F401RE has 512 KB of flash memory
+#define BKPSRAM_SIZE			0	// STM32F401RE does not have backup SRAM
+#define BKPSRAM_END				0	// STM32F401RE does not have backup SRAM
+
+#define ADDR_VALID				0x00
+#define ADDR_INVALID			0x01
+#define INVALID_SECTOR			0xFF
+
+
+
 void bootloader_jump_to_user_app(void);
 void bootloader_uart_read_data(void);
 void bootloader_uart_write_data(uint8_t *pBuffer, uint32_t len);
