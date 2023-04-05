@@ -504,6 +504,32 @@ uint8_t execute_mem_write(uint8_t *pBuffer, uint32_t mem_address, uint32_t len)
 	return status;
 }
 
+
+/* This function reads the contents of "mem_address" and copies them to pBuffer byte by byte
+ *
+ * Note1: Currently this function supports reading Flash only
+ * Note2: This functions does not check whether "mem_address" is a valid address of the MCU
+ */
+uint8_t execute_mem_read(uint8_t *pBuffer, uint32_t mem_address, uint32_t len)
+{
+	uint8_t status = HAL_OK;
+
+	// We have to unlock flash module to get control of the registers
+	HAL_FLASH_Unlock();
+
+	for(uint32_t i = 0; i < len; i++)
+	{
+		// Here we program the flash byte by byte
+		status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, mem_address+i, pBuffer[i]);
+
+	}
+
+	HAL_FLASH_Lock();
+
+	return status;
+}
+
+
 /* Modifying user option bytes
  * To modify the user option value, follow the sequence below:
  * 1. Check that no Flash memory operation is ongoing by checking the BSY bit
@@ -540,7 +566,7 @@ uint8_t configure_flash_sector_rw_protection(uint8_t sector_details, uint8_t pro
 		//please refer: flash option control register (FLASH_OPTCR) in user manual
 		*pOPTCR &= ~(1 << 31);
 
-		//clear the protection: make all bits belonging to sectos as
+		//clear the protection: make all bits belonging to sector as
 		*pOPTCR |= (0xFF << 16);
 
 		//set the option start bit (OPTSTRT) in the FLASH_OPTCR register
@@ -607,7 +633,38 @@ uint8_t configure_flash_sector_rw_protection(uint8_t sector_details, uint8_t pro
 	return 0;
 }
 
+uint16_t read_flash_sector_rw_protection()
+{
+	uint16_t status = 0x00;
 
+	// Flash option control register (OPTCR)
+	volatile uint32_t *pOPTCR = (uint32_t*)0x40023C14;
+
+	//option byte configuration unlock
+	HAL_FLASH_OB_Unlock();
+
+	//wait till no active operation on flash
+	while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+
+	//read the 31st bit (default state)
+	//please refer: flash option control register (FLASH_OPTCR) in user manual
+	status |= (uint16_t)((*pOPTCR & (1 << 31)) >> 16);
+
+	//clear the protection: make all bits belonging to sector as
+	status |= (uint16_t)(((0xFF<<16) & *pOPTCR)>>16);
+
+	//set the option start bit (OPTSTRT) in the FLASH_OPTCR register
+	*pOPTCR |= (1 << 1);
+
+	//wait till no active operation on flash
+	while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
+
+	HAL_FLASH_OB_Lock();
+
+
+
+	return status;
+}
 
 void bootloader_uart_write_data(uint8_t *pBuffer, uint32_t len)
 {
@@ -981,11 +1038,85 @@ void bootloader_handle_endis_rw_protect_cmd(uint8_t *bl_rx_buffer)
 
 void bootloader_handle_mem_read_cmd(uint8_t *bl_rx_buffer)
 {
+	uint8_t addr_valid = ADDR_VALID;
+	uint8_t read_status = 0x00;
+	uint8_t payload_len = bl_rx_buffer[6];
 
+	uint32_t mem_address = *((uint32_t *)(&bl_rx_buffer[2]));
+
+	printmsg("BL_DEBUG_MSG::bootloader_handle_mem_read_cmd\r\n");
+
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],1);
+
+		printmsg("BL_DEBUG_MSG: mem read address: %#x\r\n",mem_address);
+
+		if(verify_address(mem_address) == ADDR_VALID)
+		{
+			printmsg("BL_DEBUG_MSG: valid mem read address\r\n");
+
+			// glow the led to indicate bootloader is currently reading to memory
+			HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,GPIO_PIN_SET);
+
+			// execute mem read
+			read_status = execute_mem_read(&bl_rx_buffer[7],mem_address,payload_len);
+
+			// turn off the led to indicate bootloader finished reading to memory
+			HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,GPIO_PIN_RESET);
+
+			printmsg("BL_DEBUG_MSG:Read status: %#x\r\n",read_status);
+			bootloader_uart_write_data(((uint8_t*)&read_status), 1);
+		}
+		else
+		{
+			printmsg("BL_DEBUG_MSG: invalid mem read address\r\n");
+			read_status = ADDR_INVALID;
+			//inform host that address is invalid
+			bootloader_uart_write_data(&read_status, 1);
+		}
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
 }
 
 void bootloader_handle_read_sector_status_cmd(uint8_t *bl_rx_buffer)
 {
+	uint16_t read_status=0x00;
+
+	printmsg("BL_DEBUG_MSG::bootloader_handle_read_sector_status_cmd\r\n");
+
+	// Total length of the command packet
+	uint32_t command_packet_len = bl_rx_buffer[0]+1;
+
+	// Extract the CRC32 sent by the host
+	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
+
+	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
+	{
+		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
+		bootloader_send_ack(bl_rx_buffer[0],1);
+
+		read_status = read_flash_sector_rw_protection();
+
+		printmsg("BL_DEBUG_MSG:Read status: %#x\r\n",read_status);
+		bootloader_uart_write_data(((uint8_t*)&read_status), 2);
+	}
+	else
+	{
+		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
+		bootloader_send_nack();
+	}
 
 }
 
