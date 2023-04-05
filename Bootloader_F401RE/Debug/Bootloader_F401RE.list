@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  0002007c  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00009946  00000000  00000000  000200ac  2**0
+ 12 .debug_info   0000a0f7  00000000  00000000  000200ac  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00001aef  00000000  00000000  000299f2  2**0
+ 13 .debug_abbrev 00001d24  00000000  00000000  0002a1a3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 000008e0  00000000  00000000  0002b4e8  2**3
+ 14 .debug_aranges 000008f8  00000000  00000000  0002bec8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00000838  00000000  00000000  0002bdc8  2**3
+ 15 .debug_ranges 00000840  00000000  00000000  0002c7c0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  00015d52  00000000  00000000  0002c600  2**0
+ 16 .debug_macro  00015fa3  00000000  00000000  0002d000  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000a206  00000000  00000000  00042352  2**0
+ 17 .debug_line   0000a8ad  00000000  00000000  00042fa3  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00085f7f  00000000  00000000  0004c558  2**0
+ 18 .debug_str    00085fab  00000000  00000000  0004d850  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  000d24d7  2**0
+ 19 .comment      00000050  00000000  00000000  000d37fb  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00002720  00000000  00000000  000d2528  2**2
+ 20 .debug_frame  00002730  00000000  00000000  000d384c  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -419,2857 +419,2857 @@ Disassembly of section .text:
  8000590:	4770      	bx	lr
  8000592:	bf00      	nop
 
-08000594 <main>:
-/**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
- 8000594:	b580      	push	{r7, lr}
- 8000596:	af00      	add	r7, sp, #0
-  /* USER CODE END 1 */
+08000594 <bootloader_send_ack>:
 
-  /* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
- 8000598:	f001 f9b4 	bl	8001904 <HAL_Init>
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
-  SystemClock_Config();
- 800059c:	f000 f822 	bl	80005e4 <SystemClock_Config>
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
- 80005a0:	f000 f8f4 	bl	800078c <MX_GPIO_Init>
-  MX_USART2_UART_Init();
- 80005a4:	f000 f8c8 	bl	8000738 <MX_USART2_UART_Init>
-  MX_USART1_UART_Init();
- 80005a8:	f000 f89c 	bl	80006e4 <MX_USART1_UART_Init>
-  MX_CRC_Init();
- 80005ac:	f000 f886 	bl	80006bc <MX_CRC_Init>
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-
-	  // CHeck whether button is pressed or not. If not pressed jump to ...
-	  if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET)
- 80005b0:	f44f 5100 	mov.w	r1, #8192	; 0x2000
- 80005b4:	4808      	ldr	r0, [pc, #32]	; (80005d8 <main+0x44>)
- 80005b6:	f002 f84b 	bl	8002650 <HAL_GPIO_ReadPin>
- 80005ba:	4603      	mov	r3, r0
- 80005bc:	2b00      	cmp	r3, #0
- 80005be:	d105      	bne.n	80005cc <main+0x38>
-	  {
-		  printmsg("BL_DEBUG_MSG:Button is pressed... going to BL mode\r\n");
- 80005c0:	4806      	ldr	r0, [pc, #24]	; (80005dc <main+0x48>)
- 80005c2:	f000 fb91 	bl	8000ce8 <printmsg>
-
-		  // We should continue in bootloader mode
-		  bootloader_uart_read_data();
- 80005c6:	f000 fbb5 	bl	8000d34 <bootloader_uart_read_data>
- 80005ca:	e7f1      	b.n	80005b0 <main+0x1c>
-	  }
-	  else
-	  {
-		  printmsg("BL_DEBUG_MSG:Button is not pressed... executing user app\r\n");
- 80005cc:	4804      	ldr	r0, [pc, #16]	; (80005e0 <main+0x4c>)
- 80005ce:	f000 fb8b 	bl	8000ce8 <printmsg>
-		  bootloader_jump_to_user_app();
- 80005d2:	f001 f803 	bl	80015dc <bootloader_jump_to_user_app>
-	  if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET)
- 80005d6:	e7eb      	b.n	80005b0 <main+0x1c>
- 80005d8:	40020800 	.word	0x40020800
- 80005dc:	08004204 	.word	0x08004204
- 80005e0:	0800423c 	.word	0x0800423c
-
-080005e4 <SystemClock_Config>:
-/**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
- 80005e4:	b580      	push	{r7, lr}
- 80005e6:	b094      	sub	sp, #80	; 0x50
- 80005e8:	af00      	add	r7, sp, #0
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
- 80005ea:	f107 0320 	add.w	r3, r7, #32
- 80005ee:	2230      	movs	r2, #48	; 0x30
- 80005f0:	2100      	movs	r1, #0
- 80005f2:	4618      	mov	r0, r3
- 80005f4:	f003 f984 	bl	8003900 <memset>
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
- 80005f8:	f107 030c 	add.w	r3, r7, #12
- 80005fc:	2200      	movs	r2, #0
- 80005fe:	601a      	str	r2, [r3, #0]
- 8000600:	605a      	str	r2, [r3, #4]
- 8000602:	609a      	str	r2, [r3, #8]
- 8000604:	60da      	str	r2, [r3, #12]
- 8000606:	611a      	str	r2, [r3, #16]
-
-  /** Configure the main internal regulator output voltage
-  */
-  __HAL_RCC_PWR_CLK_ENABLE();
- 8000608:	2300      	movs	r3, #0
- 800060a:	60bb      	str	r3, [r7, #8]
- 800060c:	4b29      	ldr	r3, [pc, #164]	; (80006b4 <SystemClock_Config+0xd0>)
- 800060e:	6c1b      	ldr	r3, [r3, #64]	; 0x40
- 8000610:	4a28      	ldr	r2, [pc, #160]	; (80006b4 <SystemClock_Config+0xd0>)
- 8000612:	f043 5380 	orr.w	r3, r3, #268435456	; 0x10000000
- 8000616:	6413      	str	r3, [r2, #64]	; 0x40
- 8000618:	4b26      	ldr	r3, [pc, #152]	; (80006b4 <SystemClock_Config+0xd0>)
- 800061a:	6c1b      	ldr	r3, [r3, #64]	; 0x40
- 800061c:	f003 5380 	and.w	r3, r3, #268435456	; 0x10000000
- 8000620:	60bb      	str	r3, [r7, #8]
- 8000622:	68bb      	ldr	r3, [r7, #8]
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
- 8000624:	2300      	movs	r3, #0
- 8000626:	607b      	str	r3, [r7, #4]
- 8000628:	4b23      	ldr	r3, [pc, #140]	; (80006b8 <SystemClock_Config+0xd4>)
- 800062a:	681b      	ldr	r3, [r3, #0]
- 800062c:	f423 4340 	bic.w	r3, r3, #49152	; 0xc000
- 8000630:	4a21      	ldr	r2, [pc, #132]	; (80006b8 <SystemClock_Config+0xd4>)
- 8000632:	f443 4300 	orr.w	r3, r3, #32768	; 0x8000
- 8000636:	6013      	str	r3, [r2, #0]
- 8000638:	4b1f      	ldr	r3, [pc, #124]	; (80006b8 <SystemClock_Config+0xd4>)
- 800063a:	681b      	ldr	r3, [r3, #0]
- 800063c:	f403 4340 	and.w	r3, r3, #49152	; 0xc000
- 8000640:	607b      	str	r3, [r7, #4]
- 8000642:	687b      	ldr	r3, [r7, #4]
-
-  /** Initializes the RCC Oscillators according to the specified parameters
-  * in the RCC_OscInitTypeDef structure.
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
- 8000644:	2302      	movs	r3, #2
- 8000646:	623b      	str	r3, [r7, #32]
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
- 8000648:	2301      	movs	r3, #1
- 800064a:	62fb      	str	r3, [r7, #44]	; 0x2c
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
- 800064c:	2310      	movs	r3, #16
- 800064e:	633b      	str	r3, [r7, #48]	; 0x30
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
- 8000650:	2302      	movs	r3, #2
- 8000652:	63bb      	str	r3, [r7, #56]	; 0x38
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
- 8000654:	2300      	movs	r3, #0
- 8000656:	63fb      	str	r3, [r7, #60]	; 0x3c
-  RCC_OscInitStruct.PLL.PLLM = 16;
- 8000658:	2310      	movs	r3, #16
- 800065a:	643b      	str	r3, [r7, #64]	; 0x40
-  RCC_OscInitStruct.PLL.PLLN = 336;
- 800065c:	f44f 73a8 	mov.w	r3, #336	; 0x150
- 8000660:	647b      	str	r3, [r7, #68]	; 0x44
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
- 8000662:	2304      	movs	r3, #4
- 8000664:	64bb      	str	r3, [r7, #72]	; 0x48
-  RCC_OscInitStruct.PLL.PLLQ = 7;
- 8000666:	2307      	movs	r3, #7
- 8000668:	64fb      	str	r3, [r7, #76]	; 0x4c
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
- 800066a:	f107 0320 	add.w	r3, r7, #32
- 800066e:	4618      	mov	r0, r3
- 8000670:	f002 f820 	bl	80026b4 <HAL_RCC_OscConfig>
- 8000674:	4603      	mov	r3, r0
- 8000676:	2b00      	cmp	r3, #0
- 8000678:	d001      	beq.n	800067e <SystemClock_Config+0x9a>
-  {
-    Error_Handler();
- 800067a:	f000 ffdb 	bl	8001634 <Error_Handler>
-  }
-
-  /** Initializes the CPU, AHB and APB buses clocks
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
- 800067e:	230f      	movs	r3, #15
- 8000680:	60fb      	str	r3, [r7, #12]
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
- 8000682:	2302      	movs	r3, #2
- 8000684:	613b      	str	r3, [r7, #16]
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
- 8000686:	2300      	movs	r3, #0
- 8000688:	617b      	str	r3, [r7, #20]
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
- 800068a:	f44f 5380 	mov.w	r3, #4096	; 0x1000
- 800068e:	61bb      	str	r3, [r7, #24]
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
- 8000690:	2300      	movs	r3, #0
- 8000692:	61fb      	str	r3, [r7, #28]
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
- 8000694:	f107 030c 	add.w	r3, r7, #12
- 8000698:	2102      	movs	r1, #2
- 800069a:	4618      	mov	r0, r3
- 800069c:	f002 fa82 	bl	8002ba4 <HAL_RCC_ClockConfig>
- 80006a0:	4603      	mov	r3, r0
- 80006a2:	2b00      	cmp	r3, #0
- 80006a4:	d001      	beq.n	80006aa <SystemClock_Config+0xc6>
-  {
-    Error_Handler();
- 80006a6:	f000 ffc5 	bl	8001634 <Error_Handler>
-  }
-}
- 80006aa:	bf00      	nop
- 80006ac:	3750      	adds	r7, #80	; 0x50
- 80006ae:	46bd      	mov	sp, r7
- 80006b0:	bd80      	pop	{r7, pc}
- 80006b2:	bf00      	nop
- 80006b4:	40023800 	.word	0x40023800
- 80006b8:	40007000 	.word	0x40007000
-
-080006bc <MX_CRC_Init>:
-  * @brief CRC Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_CRC_Init(void)
-{
- 80006bc:	b580      	push	{r7, lr}
- 80006be:	af00      	add	r7, sp, #0
-  /* USER CODE END CRC_Init 0 */
-
-  /* USER CODE BEGIN CRC_Init 1 */
-
-  /* USER CODE END CRC_Init 1 */
-  hcrc.Instance = CRC;
- 80006c0:	4b06      	ldr	r3, [pc, #24]	; (80006dc <MX_CRC_Init+0x20>)
- 80006c2:	4a07      	ldr	r2, [pc, #28]	; (80006e0 <MX_CRC_Init+0x24>)
- 80006c4:	601a      	str	r2, [r3, #0]
-  if (HAL_CRC_Init(&hcrc) != HAL_OK)
- 80006c6:	4805      	ldr	r0, [pc, #20]	; (80006dc <MX_CRC_Init+0x20>)
- 80006c8:	f001 fa73 	bl	8001bb2 <HAL_CRC_Init>
- 80006cc:	4603      	mov	r3, r0
- 80006ce:	2b00      	cmp	r3, #0
- 80006d0:	d001      	beq.n	80006d6 <MX_CRC_Init+0x1a>
-  {
-    Error_Handler();
- 80006d2:	f000 ffaf 	bl	8001634 <Error_Handler>
-  }
-  /* USER CODE BEGIN CRC_Init 2 */
-
-  /* USER CODE END CRC_Init 2 */
-
-}
- 80006d6:	bf00      	nop
- 80006d8:	bd80      	pop	{r7, pc}
- 80006da:	bf00      	nop
- 80006dc:	20000098 	.word	0x20000098
- 80006e0:	40023000 	.word	0x40023000
-
-080006e4 <MX_USART1_UART_Init>:
-  * @brief USART1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART1_UART_Init(void)
-{
- 80006e4:	b580      	push	{r7, lr}
- 80006e6:	af00      	add	r7, sp, #0
-  /* USER CODE END USART1_Init 0 */
-
-  /* USER CODE BEGIN USART1_Init 1 */
-
-  /* USER CODE END USART1_Init 1 */
-  huart1.Instance = USART1;
- 80006e8:	4b11      	ldr	r3, [pc, #68]	; (8000730 <MX_USART1_UART_Init+0x4c>)
- 80006ea:	4a12      	ldr	r2, [pc, #72]	; (8000734 <MX_USART1_UART_Init+0x50>)
- 80006ec:	601a      	str	r2, [r3, #0]
-  huart1.Init.BaudRate = 115200;
- 80006ee:	4b10      	ldr	r3, [pc, #64]	; (8000730 <MX_USART1_UART_Init+0x4c>)
- 80006f0:	f44f 32e1 	mov.w	r2, #115200	; 0x1c200
- 80006f4:	605a      	str	r2, [r3, #4]
-  huart1.Init.WordLength = UART_WORDLENGTH_8B;
- 80006f6:	4b0e      	ldr	r3, [pc, #56]	; (8000730 <MX_USART1_UART_Init+0x4c>)
- 80006f8:	2200      	movs	r2, #0
- 80006fa:	609a      	str	r2, [r3, #8]
-  huart1.Init.StopBits = UART_STOPBITS_1;
- 80006fc:	4b0c      	ldr	r3, [pc, #48]	; (8000730 <MX_USART1_UART_Init+0x4c>)
- 80006fe:	2200      	movs	r2, #0
- 8000700:	60da      	str	r2, [r3, #12]
-  huart1.Init.Parity = UART_PARITY_NONE;
- 8000702:	4b0b      	ldr	r3, [pc, #44]	; (8000730 <MX_USART1_UART_Init+0x4c>)
- 8000704:	2200      	movs	r2, #0
- 8000706:	611a      	str	r2, [r3, #16]
-  huart1.Init.Mode = UART_MODE_TX_RX;
- 8000708:	4b09      	ldr	r3, [pc, #36]	; (8000730 <MX_USART1_UART_Init+0x4c>)
- 800070a:	220c      	movs	r2, #12
- 800070c:	615a      	str	r2, [r3, #20]
-  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
- 800070e:	4b08      	ldr	r3, [pc, #32]	; (8000730 <MX_USART1_UART_Init+0x4c>)
- 8000710:	2200      	movs	r2, #0
- 8000712:	619a      	str	r2, [r3, #24]
-  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
- 8000714:	4b06      	ldr	r3, [pc, #24]	; (8000730 <MX_USART1_UART_Init+0x4c>)
- 8000716:	2200      	movs	r2, #0
- 8000718:	61da      	str	r2, [r3, #28]
-  if (HAL_UART_Init(&huart1) != HAL_OK)
- 800071a:	4805      	ldr	r0, [pc, #20]	; (8000730 <MX_USART1_UART_Init+0x4c>)
- 800071c:	f002 fc62 	bl	8002fe4 <HAL_UART_Init>
- 8000720:	4603      	mov	r3, r0
- 8000722:	2b00      	cmp	r3, #0
- 8000724:	d001      	beq.n	800072a <MX_USART1_UART_Init+0x46>
-  {
-    Error_Handler();
- 8000726:	f000 ff85 	bl	8001634 <Error_Handler>
-  }
-  /* USER CODE BEGIN USART1_Init 2 */
-
-  /* USER CODE END USART1_Init 2 */
-
-}
- 800072a:	bf00      	nop
- 800072c:	bd80      	pop	{r7, pc}
- 800072e:	bf00      	nop
- 8000730:	200000a0 	.word	0x200000a0
- 8000734:	40011000 	.word	0x40011000
-
-08000738 <MX_USART2_UART_Init>:
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
-{
- 8000738:	b580      	push	{r7, lr}
- 800073a:	af00      	add	r7, sp, #0
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
- 800073c:	4b11      	ldr	r3, [pc, #68]	; (8000784 <MX_USART2_UART_Init+0x4c>)
- 800073e:	4a12      	ldr	r2, [pc, #72]	; (8000788 <MX_USART2_UART_Init+0x50>)
- 8000740:	601a      	str	r2, [r3, #0]
-  huart2.Init.BaudRate = 115200;
- 8000742:	4b10      	ldr	r3, [pc, #64]	; (8000784 <MX_USART2_UART_Init+0x4c>)
- 8000744:	f44f 32e1 	mov.w	r2, #115200	; 0x1c200
- 8000748:	605a      	str	r2, [r3, #4]
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
- 800074a:	4b0e      	ldr	r3, [pc, #56]	; (8000784 <MX_USART2_UART_Init+0x4c>)
- 800074c:	2200      	movs	r2, #0
- 800074e:	609a      	str	r2, [r3, #8]
-  huart2.Init.StopBits = UART_STOPBITS_1;
- 8000750:	4b0c      	ldr	r3, [pc, #48]	; (8000784 <MX_USART2_UART_Init+0x4c>)
- 8000752:	2200      	movs	r2, #0
- 8000754:	60da      	str	r2, [r3, #12]
-  huart2.Init.Parity = UART_PARITY_NONE;
- 8000756:	4b0b      	ldr	r3, [pc, #44]	; (8000784 <MX_USART2_UART_Init+0x4c>)
- 8000758:	2200      	movs	r2, #0
- 800075a:	611a      	str	r2, [r3, #16]
-  huart2.Init.Mode = UART_MODE_TX_RX;
- 800075c:	4b09      	ldr	r3, [pc, #36]	; (8000784 <MX_USART2_UART_Init+0x4c>)
- 800075e:	220c      	movs	r2, #12
- 8000760:	615a      	str	r2, [r3, #20]
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
- 8000762:	4b08      	ldr	r3, [pc, #32]	; (8000784 <MX_USART2_UART_Init+0x4c>)
- 8000764:	2200      	movs	r2, #0
- 8000766:	619a      	str	r2, [r3, #24]
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
- 8000768:	4b06      	ldr	r3, [pc, #24]	; (8000784 <MX_USART2_UART_Init+0x4c>)
- 800076a:	2200      	movs	r2, #0
- 800076c:	61da      	str	r2, [r3, #28]
-  if (HAL_UART_Init(&huart2) != HAL_OK)
- 800076e:	4805      	ldr	r0, [pc, #20]	; (8000784 <MX_USART2_UART_Init+0x4c>)
- 8000770:	f002 fc38 	bl	8002fe4 <HAL_UART_Init>
- 8000774:	4603      	mov	r3, r0
- 8000776:	2b00      	cmp	r3, #0
- 8000778:	d001      	beq.n	800077e <MX_USART2_UART_Init+0x46>
-  {
-    Error_Handler();
- 800077a:	f000 ff5b 	bl	8001634 <Error_Handler>
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
-
-}
- 800077e:	bf00      	nop
- 8000780:	bd80      	pop	{r7, pc}
- 8000782:	bf00      	nop
- 8000784:	200000e4 	.word	0x200000e4
- 8000788:	40004400 	.word	0x40004400
-
-0800078c <MX_GPIO_Init>:
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
-{
- 800078c:	b580      	push	{r7, lr}
- 800078e:	b08a      	sub	sp, #40	; 0x28
- 8000790:	af00      	add	r7, sp, #0
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
- 8000792:	f107 0314 	add.w	r3, r7, #20
- 8000796:	2200      	movs	r2, #0
- 8000798:	601a      	str	r2, [r3, #0]
- 800079a:	605a      	str	r2, [r3, #4]
- 800079c:	609a      	str	r2, [r3, #8]
- 800079e:	60da      	str	r2, [r3, #12]
- 80007a0:	611a      	str	r2, [r3, #16]
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOC_CLK_ENABLE();
- 80007a2:	2300      	movs	r3, #0
- 80007a4:	613b      	str	r3, [r7, #16]
- 80007a6:	4b2d      	ldr	r3, [pc, #180]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007a8:	6b1b      	ldr	r3, [r3, #48]	; 0x30
- 80007aa:	4a2c      	ldr	r2, [pc, #176]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007ac:	f043 0304 	orr.w	r3, r3, #4
- 80007b0:	6313      	str	r3, [r2, #48]	; 0x30
- 80007b2:	4b2a      	ldr	r3, [pc, #168]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007b4:	6b1b      	ldr	r3, [r3, #48]	; 0x30
- 80007b6:	f003 0304 	and.w	r3, r3, #4
- 80007ba:	613b      	str	r3, [r7, #16]
- 80007bc:	693b      	ldr	r3, [r7, #16]
-  __HAL_RCC_GPIOH_CLK_ENABLE();
- 80007be:	2300      	movs	r3, #0
- 80007c0:	60fb      	str	r3, [r7, #12]
- 80007c2:	4b26      	ldr	r3, [pc, #152]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007c4:	6b1b      	ldr	r3, [r3, #48]	; 0x30
- 80007c6:	4a25      	ldr	r2, [pc, #148]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007c8:	f043 0380 	orr.w	r3, r3, #128	; 0x80
- 80007cc:	6313      	str	r3, [r2, #48]	; 0x30
- 80007ce:	4b23      	ldr	r3, [pc, #140]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007d0:	6b1b      	ldr	r3, [r3, #48]	; 0x30
- 80007d2:	f003 0380 	and.w	r3, r3, #128	; 0x80
- 80007d6:	60fb      	str	r3, [r7, #12]
- 80007d8:	68fb      	ldr	r3, [r7, #12]
-  __HAL_RCC_GPIOA_CLK_ENABLE();
- 80007da:	2300      	movs	r3, #0
- 80007dc:	60bb      	str	r3, [r7, #8]
- 80007de:	4b1f      	ldr	r3, [pc, #124]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007e0:	6b1b      	ldr	r3, [r3, #48]	; 0x30
- 80007e2:	4a1e      	ldr	r2, [pc, #120]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007e4:	f043 0301 	orr.w	r3, r3, #1
- 80007e8:	6313      	str	r3, [r2, #48]	; 0x30
- 80007ea:	4b1c      	ldr	r3, [pc, #112]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007ec:	6b1b      	ldr	r3, [r3, #48]	; 0x30
- 80007ee:	f003 0301 	and.w	r3, r3, #1
- 80007f2:	60bb      	str	r3, [r7, #8]
- 80007f4:	68bb      	ldr	r3, [r7, #8]
-  __HAL_RCC_GPIOB_CLK_ENABLE();
- 80007f6:	2300      	movs	r3, #0
- 80007f8:	607b      	str	r3, [r7, #4]
- 80007fa:	4b18      	ldr	r3, [pc, #96]	; (800085c <MX_GPIO_Init+0xd0>)
- 80007fc:	6b1b      	ldr	r3, [r3, #48]	; 0x30
- 80007fe:	4a17      	ldr	r2, [pc, #92]	; (800085c <MX_GPIO_Init+0xd0>)
- 8000800:	f043 0302 	orr.w	r3, r3, #2
- 8000804:	6313      	str	r3, [r2, #48]	; 0x30
- 8000806:	4b15      	ldr	r3, [pc, #84]	; (800085c <MX_GPIO_Init+0xd0>)
- 8000808:	6b1b      	ldr	r3, [r3, #48]	; 0x30
- 800080a:	f003 0302 	and.w	r3, r3, #2
- 800080e:	607b      	str	r3, [r7, #4]
- 8000810:	687b      	ldr	r3, [r7, #4]
-
-  /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
- 8000812:	2200      	movs	r2, #0
- 8000814:	2120      	movs	r1, #32
- 8000816:	4812      	ldr	r0, [pc, #72]	; (8000860 <MX_GPIO_Init+0xd4>)
- 8000818:	f001 ff32 	bl	8002680 <HAL_GPIO_WritePin>
-
-  /*Configure GPIO pin : B1_Pin */
-  GPIO_InitStruct.Pin = B1_Pin;
- 800081c:	f44f 5300 	mov.w	r3, #8192	; 0x2000
- 8000820:	617b      	str	r3, [r7, #20]
-  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
- 8000822:	f44f 1304 	mov.w	r3, #2162688	; 0x210000
- 8000826:	61bb      	str	r3, [r7, #24]
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
- 8000828:	2300      	movs	r3, #0
- 800082a:	61fb      	str	r3, [r7, #28]
-  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
- 800082c:	f107 0314 	add.w	r3, r7, #20
- 8000830:	4619      	mov	r1, r3
- 8000832:	480c      	ldr	r0, [pc, #48]	; (8000864 <MX_GPIO_Init+0xd8>)
- 8000834:	f001 fd88 	bl	8002348 <HAL_GPIO_Init>
-
-  /*Configure GPIO pin : LD2_Pin */
-  GPIO_InitStruct.Pin = LD2_Pin;
- 8000838:	2320      	movs	r3, #32
- 800083a:	617b      	str	r3, [r7, #20]
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
- 800083c:	2301      	movs	r3, #1
- 800083e:	61bb      	str	r3, [r7, #24]
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
- 8000840:	2300      	movs	r3, #0
- 8000842:	61fb      	str	r3, [r7, #28]
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
- 8000844:	2300      	movs	r3, #0
- 8000846:	623b      	str	r3, [r7, #32]
-  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
- 8000848:	f107 0314 	add.w	r3, r7, #20
- 800084c:	4619      	mov	r1, r3
- 800084e:	4804      	ldr	r0, [pc, #16]	; (8000860 <MX_GPIO_Init+0xd4>)
- 8000850:	f001 fd7a 	bl	8002348 <HAL_GPIO_Init>
-
-}
- 8000854:	bf00      	nop
- 8000856:	3728      	adds	r7, #40	; 0x28
- 8000858:	46bd      	mov	sp, r7
- 800085a:	bd80      	pop	{r7, pc}
- 800085c:	40023800 	.word	0x40023800
- 8000860:	40020000 	.word	0x40020000
- 8000864:	40020800 	.word	0x40020800
-
-08000868 <bootloader_send_ack>:
-
-/* USER CODE BEGIN 4 */
 
 
 void bootloader_send_ack(uint8_t command_code, uint8_t follow_len)
 {
- 8000868:	b580      	push	{r7, lr}
- 800086a:	b084      	sub	sp, #16
- 800086c:	af00      	add	r7, sp, #0
- 800086e:	4603      	mov	r3, r0
- 8000870:	460a      	mov	r2, r1
- 8000872:	71fb      	strb	r3, [r7, #7]
- 8000874:	4613      	mov	r3, r2
- 8000876:	71bb      	strb	r3, [r7, #6]
+ 8000594:	b580      	push	{r7, lr}
+ 8000596:	b084      	sub	sp, #16
+ 8000598:	af00      	add	r7, sp, #0
+ 800059a:	4603      	mov	r3, r0
+ 800059c:	460a      	mov	r2, r1
+ 800059e:	71fb      	strb	r3, [r7, #7]
+ 80005a0:	4613      	mov	r3, r2
+ 80005a2:	71bb      	strb	r3, [r7, #6]
 	//Here we send 2 bytes. First byte is ack and second byte is len value
 	uint8_t ack_buf[2];
 	ack_buf[0] = BL_ACK;
- 8000878:	23a5      	movs	r3, #165	; 0xa5
- 800087a:	733b      	strb	r3, [r7, #12]
+ 80005a4:	23a5      	movs	r3, #165	; 0xa5
+ 80005a6:	733b      	strb	r3, [r7, #12]
 	ack_buf[1] = follow_len;
- 800087c:	79bb      	ldrb	r3, [r7, #6]
- 800087e:	737b      	strb	r3, [r7, #13]
+ 80005a8:	79bb      	ldrb	r3, [r7, #6]
+ 80005aa:	737b      	strb	r3, [r7, #13]
 	HAL_UART_Transmit(C_UART, ack_buf, 2, HAL_MAX_DELAY);
- 8000880:	f107 010c 	add.w	r1, r7, #12
- 8000884:	f04f 33ff 	mov.w	r3, #4294967295
- 8000888:	2202      	movs	r2, #2
- 800088a:	4803      	ldr	r0, [pc, #12]	; (8000898 <bootloader_send_ack+0x30>)
- 800088c:	f002 fbf7 	bl	800307e <HAL_UART_Transmit>
+ 80005ac:	f107 010c 	add.w	r1, r7, #12
+ 80005b0:	f04f 33ff 	mov.w	r3, #4294967295
+ 80005b4:	2202      	movs	r2, #2
+ 80005b6:	4803      	ldr	r0, [pc, #12]	; (80005c4 <bootloader_send_ack+0x30>)
+ 80005b8:	f002 fd61 	bl	800307e <HAL_UART_Transmit>
 }
- 8000890:	bf00      	nop
- 8000892:	3710      	adds	r7, #16
- 8000894:	46bd      	mov	sp, r7
- 8000896:	bd80      	pop	{r7, pc}
- 8000898:	200000e4 	.word	0x200000e4
+ 80005bc:	bf00      	nop
+ 80005be:	3710      	adds	r7, #16
+ 80005c0:	46bd      	mov	sp, r7
+ 80005c2:	bd80      	pop	{r7, pc}
+ 80005c4:	200001ac 	.word	0x200001ac
 
-0800089c <bootloader_send_nack>:
+080005c8 <bootloader_send_nack>:
 
 void bootloader_send_nack(void)
 {
- 800089c:	b580      	push	{r7, lr}
- 800089e:	b082      	sub	sp, #8
- 80008a0:	af00      	add	r7, sp, #0
+ 80005c8:	b580      	push	{r7, lr}
+ 80005ca:	b082      	sub	sp, #8
+ 80005cc:	af00      	add	r7, sp, #0
 	uint8_t nack = BL_NACK;
- 80008a2:	237f      	movs	r3, #127	; 0x7f
- 80008a4:	71fb      	strb	r3, [r7, #7]
+ 80005ce:	237f      	movs	r3, #127	; 0x7f
+ 80005d0:	71fb      	strb	r3, [r7, #7]
 	HAL_UART_Transmit(C_UART, &nack, 1, HAL_MAX_DELAY);
- 80008a6:	1df9      	adds	r1, r7, #7
- 80008a8:	f04f 33ff 	mov.w	r3, #4294967295
- 80008ac:	2201      	movs	r2, #1
- 80008ae:	4803      	ldr	r0, [pc, #12]	; (80008bc <bootloader_send_nack+0x20>)
- 80008b0:	f002 fbe5 	bl	800307e <HAL_UART_Transmit>
+ 80005d2:	1df9      	adds	r1, r7, #7
+ 80005d4:	f04f 33ff 	mov.w	r3, #4294967295
+ 80005d8:	2201      	movs	r2, #1
+ 80005da:	4803      	ldr	r0, [pc, #12]	; (80005e8 <bootloader_send_nack+0x20>)
+ 80005dc:	f002 fd4f 	bl	800307e <HAL_UART_Transmit>
 }
- 80008b4:	bf00      	nop
- 80008b6:	3708      	adds	r7, #8
- 80008b8:	46bd      	mov	sp, r7
- 80008ba:	bd80      	pop	{r7, pc}
- 80008bc:	200000e4 	.word	0x200000e4
+ 80005e0:	bf00      	nop
+ 80005e2:	3708      	adds	r7, #8
+ 80005e4:	46bd      	mov	sp, r7
+ 80005e6:	bd80      	pop	{r7, pc}
+ 80005e8:	200001ac 	.word	0x200001ac
 
-080008c0 <bootloader_verify_crc>:
+080005ec <bootloader_verify_crc>:
 
 
 uint8_t bootloader_verify_crc(uint8_t* pData, uint32_t len, uint32_t crc_host)
 {
- 80008c0:	b580      	push	{r7, lr}
- 80008c2:	b088      	sub	sp, #32
- 80008c4:	af00      	add	r7, sp, #0
- 80008c6:	60f8      	str	r0, [r7, #12]
- 80008c8:	60b9      	str	r1, [r7, #8]
- 80008ca:	607a      	str	r2, [r7, #4]
+ 80005ec:	b580      	push	{r7, lr}
+ 80005ee:	b088      	sub	sp, #32
+ 80005f0:	af00      	add	r7, sp, #0
+ 80005f2:	60f8      	str	r0, [r7, #12]
+ 80005f4:	60b9      	str	r1, [r7, #8]
+ 80005f6:	607a      	str	r2, [r7, #4]
 	uint32_t uwCRCValue = 0xFF;
- 80008cc:	23ff      	movs	r3, #255	; 0xff
- 80008ce:	61fb      	str	r3, [r7, #28]
+ 80005f8:	23ff      	movs	r3, #255	; 0xff
+ 80005fa:	61fb      	str	r3, [r7, #28]
 
 	// Cleans the CRC calculation unit
 	__HAL_CRC_DR_RESET(&hcrc);
- 80008d0:	4b17      	ldr	r3, [pc, #92]	; (8000930 <bootloader_verify_crc+0x70>)
- 80008d2:	681b      	ldr	r3, [r3, #0]
- 80008d4:	689a      	ldr	r2, [r3, #8]
- 80008d6:	4b16      	ldr	r3, [pc, #88]	; (8000930 <bootloader_verify_crc+0x70>)
- 80008d8:	681b      	ldr	r3, [r3, #0]
- 80008da:	f042 0201 	orr.w	r2, r2, #1
- 80008de:	609a      	str	r2, [r3, #8]
+ 80005fc:	4b17      	ldr	r3, [pc, #92]	; (800065c <bootloader_verify_crc+0x70>)
+ 80005fe:	681b      	ldr	r3, [r3, #0]
+ 8000600:	689a      	ldr	r2, [r3, #8]
+ 8000602:	4b16      	ldr	r3, [pc, #88]	; (800065c <bootloader_verify_crc+0x70>)
+ 8000604:	681b      	ldr	r3, [r3, #0]
+ 8000606:	f042 0201 	orr.w	r2, r2, #1
+ 800060a:	609a      	str	r2, [r3, #8]
 
 	for(uint32_t i=0; i<len; i++)
- 80008e0:	2300      	movs	r3, #0
- 80008e2:	61bb      	str	r3, [r7, #24]
- 80008e4:	e00f      	b.n	8000906 <bootloader_verify_crc+0x46>
+ 800060c:	2300      	movs	r3, #0
+ 800060e:	61bb      	str	r3, [r7, #24]
+ 8000610:	e00f      	b.n	8000632 <bootloader_verify_crc+0x46>
 	{
 		uint32_t i_data = pData[i];
- 80008e6:	68fa      	ldr	r2, [r7, #12]
- 80008e8:	69bb      	ldr	r3, [r7, #24]
- 80008ea:	4413      	add	r3, r2
- 80008ec:	781b      	ldrb	r3, [r3, #0]
- 80008ee:	617b      	str	r3, [r7, #20]
+ 8000612:	68fa      	ldr	r2, [r7, #12]
+ 8000614:	69bb      	ldr	r3, [r7, #24]
+ 8000616:	4413      	add	r3, r2
+ 8000618:	781b      	ldrb	r3, [r3, #0]
+ 800061a:	617b      	str	r3, [r7, #20]
 		uwCRCValue = HAL_CRC_Accumulate(&hcrc, &i_data, 1);
- 80008f0:	f107 0314 	add.w	r3, r7, #20
- 80008f4:	2201      	movs	r2, #1
- 80008f6:	4619      	mov	r1, r3
- 80008f8:	480d      	ldr	r0, [pc, #52]	; (8000930 <bootloader_verify_crc+0x70>)
- 80008fa:	f001 f976 	bl	8001bea <HAL_CRC_Accumulate>
- 80008fe:	61f8      	str	r0, [r7, #28]
+ 800061c:	f107 0314 	add.w	r3, r7, #20
+ 8000620:	2201      	movs	r2, #1
+ 8000622:	4619      	mov	r1, r3
+ 8000624:	480d      	ldr	r0, [pc, #52]	; (800065c <bootloader_verify_crc+0x70>)
+ 8000626:	f001 fae0 	bl	8001bea <HAL_CRC_Accumulate>
+ 800062a:	61f8      	str	r0, [r7, #28]
 	for(uint32_t i=0; i<len; i++)
- 8000900:	69bb      	ldr	r3, [r7, #24]
- 8000902:	3301      	adds	r3, #1
- 8000904:	61bb      	str	r3, [r7, #24]
- 8000906:	69ba      	ldr	r2, [r7, #24]
- 8000908:	68bb      	ldr	r3, [r7, #8]
- 800090a:	429a      	cmp	r2, r3
- 800090c:	d3eb      	bcc.n	80008e6 <bootloader_verify_crc+0x26>
+ 800062c:	69bb      	ldr	r3, [r7, #24]
+ 800062e:	3301      	adds	r3, #1
+ 8000630:	61bb      	str	r3, [r7, #24]
+ 8000632:	69ba      	ldr	r2, [r7, #24]
+ 8000634:	68bb      	ldr	r3, [r7, #8]
+ 8000636:	429a      	cmp	r2, r3
+ 8000638:	d3eb      	bcc.n	8000612 <bootloader_verify_crc+0x26>
 	}
 	printmsg("BL_DEBUG_MSG: CRC received: %#x	CRC computed: %#x\r\n",crc_host,uwCRCValue);
- 800090e:	69fa      	ldr	r2, [r7, #28]
- 8000910:	6879      	ldr	r1, [r7, #4]
- 8000912:	4808      	ldr	r0, [pc, #32]	; (8000934 <bootloader_verify_crc+0x74>)
- 8000914:	f000 f9e8 	bl	8000ce8 <printmsg>
+ 800063a:	69fa      	ldr	r2, [r7, #28]
+ 800063c:	6879      	ldr	r1, [r7, #4]
+ 800063e:	4808      	ldr	r0, [pc, #32]	; (8000660 <bootloader_verify_crc+0x74>)
+ 8000640:	f000 f9e8 	bl	8000a14 <printmsg>
 
 
 	if(uwCRCValue == crc_host)
- 8000918:	69fa      	ldr	r2, [r7, #28]
- 800091a:	687b      	ldr	r3, [r7, #4]
- 800091c:	429a      	cmp	r2, r3
- 800091e:	d101      	bne.n	8000924 <bootloader_verify_crc+0x64>
+ 8000644:	69fa      	ldr	r2, [r7, #28]
+ 8000646:	687b      	ldr	r3, [r7, #4]
+ 8000648:	429a      	cmp	r2, r3
+ 800064a:	d101      	bne.n	8000650 <bootloader_verify_crc+0x64>
 	{
 		return VERIFY_CRC_SUCCESS;
- 8000920:	2300      	movs	r3, #0
- 8000922:	e000      	b.n	8000926 <bootloader_verify_crc+0x66>
+ 800064c:	2300      	movs	r3, #0
+ 800064e:	e000      	b.n	8000652 <bootloader_verify_crc+0x66>
 	}
 
 	return VERIFY_CRC_FAIL;
- 8000924:	2301      	movs	r3, #1
+ 8000650:	2301      	movs	r3, #1
 }
- 8000926:	4618      	mov	r0, r3
- 8000928:	3720      	adds	r7, #32
- 800092a:	46bd      	mov	sp, r7
- 800092c:	bd80      	pop	{r7, pc}
- 800092e:	bf00      	nop
- 8000930:	20000098 	.word	0x20000098
- 8000934:	08004278 	.word	0x08004278
+ 8000652:	4618      	mov	r0, r3
+ 8000654:	3720      	adds	r7, #32
+ 8000656:	46bd      	mov	sp, r7
+ 8000658:	bd80      	pop	{r7, pc}
+ 800065a:	bf00      	nop
+ 800065c:	20000160 	.word	0x20000160
+ 8000660:	08004204 	.word	0x08004204
 
-08000938 <get_bootloader_version>:
+08000664 <get_bootloader_version>:
 
 
 uint8_t get_bootloader_version(void)
 {
- 8000938:	b480      	push	{r7}
- 800093a:	af00      	add	r7, sp, #0
+ 8000664:	b480      	push	{r7}
+ 8000666:	af00      	add	r7, sp, #0
 	return (uint8_t)BL_VERSION;
- 800093c:	2310      	movs	r3, #16
+ 8000668:	2310      	movs	r3, #16
 }
- 800093e:	4618      	mov	r0, r3
- 8000940:	46bd      	mov	sp, r7
- 8000942:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000946:	4770      	bx	lr
+ 800066a:	4618      	mov	r0, r3
+ 800066c:	46bd      	mov	sp, r7
+ 800066e:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000672:	4770      	bx	lr
 
-08000948 <get_mcu_chip_id>:
+08000674 <get_mcu_chip_id>:
 
 
 uint16_t get_mcu_chip_id(void)
 {
- 8000948:	b480      	push	{r7}
- 800094a:	b083      	sub	sp, #12
- 800094c:	af00      	add	r7, sp, #0
+ 8000674:	b480      	push	{r7}
+ 8000676:	b083      	sub	sp, #12
+ 8000678:	af00      	add	r7, sp, #0
 	 *  and the die revision. It is part of the DBG_MCU component and is mapped on the
 	 *  external PPB bus (see Section 33.16 on page 1304). This code is accessible using the
 	 *  JTAG debug pCat.2ort (4 to 5 pins) or the SW debug port (two pins) or by the user software
 	 *  It is even accessible while the MECU is under system reset.
 	 */
 	uint16_t cid = (uint16_t)(DBGMCU->IDCODE)&0x0FFF;
- 800094e:	4b06      	ldr	r3, [pc, #24]	; (8000968 <get_mcu_chip_id+0x20>)
- 8000950:	681b      	ldr	r3, [r3, #0]
- 8000952:	b29b      	uxth	r3, r3
- 8000954:	f3c3 030b 	ubfx	r3, r3, #0, #12
- 8000958:	80fb      	strh	r3, [r7, #6]
+ 800067a:	4b06      	ldr	r3, [pc, #24]	; (8000694 <get_mcu_chip_id+0x20>)
+ 800067c:	681b      	ldr	r3, [r3, #0]
+ 800067e:	b29b      	uxth	r3, r3
+ 8000680:	f3c3 030b 	ubfx	r3, r3, #0, #12
+ 8000684:	80fb      	strh	r3, [r7, #6]
 	return cid;
- 800095a:	88fb      	ldrh	r3, [r7, #6]
+ 8000686:	88fb      	ldrh	r3, [r7, #6]
 }
- 800095c:	4618      	mov	r0, r3
- 800095e:	370c      	adds	r7, #12
- 8000960:	46bd      	mov	sp, r7
- 8000962:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8000966:	4770      	bx	lr
- 8000968:	e0042000 	.word	0xe0042000
+ 8000688:	4618      	mov	r0, r3
+ 800068a:	370c      	adds	r7, #12
+ 800068c:	46bd      	mov	sp, r7
+ 800068e:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8000692:	4770      	bx	lr
+ 8000694:	e0042000 	.word	0xe0042000
 
-0800096c <get_flash_rdp_level>:
+08000698 <get_flash_rdp_level>:
 
 uint8_t get_flash_rdp_level(void)
 {
- 800096c:	b580      	push	{r7, lr}
- 800096e:	b088      	sub	sp, #32
- 8000970:	af00      	add	r7, sp, #0
+ 8000698:	b580      	push	{r7, lr}
+ 800069a:	b088      	sub	sp, #32
+ 800069c:	af00      	add	r7, sp, #0
 	uint8_t rdp_status = 0;
- 8000972:	2300      	movs	r3, #0
- 8000974:	77fb      	strb	r3, [r7, #31]
+ 800069e:	2300      	movs	r3, #0
+ 80006a0:	77fb      	strb	r3, [r7, #31]
 
 #if 1
 	FLASH_OBProgramInitTypeDef ob_handle;
 	HAL_FLASHEx_OBGetConfig(&ob_handle);
- 8000976:	463b      	mov	r3, r7
- 8000978:	4618      	mov	r0, r3
- 800097a:	f001 fbc3 	bl	8002104 <HAL_FLASHEx_OBGetConfig>
+ 80006a2:	463b      	mov	r3, r7
+ 80006a4:	4618      	mov	r0, r3
+ 80006a6:	f001 fd2d 	bl	8002104 <HAL_FLASHEx_OBGetConfig>
 	rdp_status = (uint8_t) ob_handle.RDPLevel;
- 800097e:	693b      	ldr	r3, [r7, #16]
- 8000980:	77fb      	strb	r3, [r7, #31]
+ 80006aa:	693b      	ldr	r3, [r7, #16]
+ 80006ac:	77fb      	strb	r3, [r7, #31]
 #else
 	// Read Flash options bytes array
 	volatile uint32_t *pOB_addr = (uint32_t*) 0x1FFFC000;
 	rdp_status = (uint8_t)(*pOB_addr >> 8);
 #endif
 	return rdp_status;
- 8000982:	7ffb      	ldrb	r3, [r7, #31]
+ 80006ae:	7ffb      	ldrb	r3, [r7, #31]
 }
- 8000984:	4618      	mov	r0, r3
- 8000986:	3720      	adds	r7, #32
- 8000988:	46bd      	mov	sp, r7
- 800098a:	bd80      	pop	{r7, pc}
+ 80006b0:	4618      	mov	r0, r3
+ 80006b2:	3720      	adds	r7, #32
+ 80006b4:	46bd      	mov	sp, r7
+ 80006b6:	bd80      	pop	{r7, pc}
 
-0800098c <verify_address>:
+080006b8 <verify_address>:
 
 uint8_t verify_address(uint32_t go_address)
 {
- 800098c:	b480      	push	{r7}
- 800098e:	b083      	sub	sp, #12
- 8000990:	af00      	add	r7, sp, #0
- 8000992:	6078      	str	r0, [r7, #4]
+ 80006b8:	b480      	push	{r7}
+ 80006ba:	b083      	sub	sp, #12
+ 80006bc:	af00      	add	r7, sp, #0
+ 80006be:	6078      	str	r0, [r7, #4]
 	 * - backup SRAM memory
 	 * - external memory
 	 */
 
 
 	if(SRAM1_BASE <= go_address && go_address <= SRAM1_END)
- 8000994:	687b      	ldr	r3, [r7, #4]
- 8000996:	f1b3 5f00 	cmp.w	r3, #536870912	; 0x20000000
- 800099a:	d305      	bcc.n	80009a8 <verify_address+0x1c>
- 800099c:	687b      	ldr	r3, [r7, #4]
- 800099e:	4a0b      	ldr	r2, [pc, #44]	; (80009cc <verify_address+0x40>)
- 80009a0:	4293      	cmp	r3, r2
- 80009a2:	d801      	bhi.n	80009a8 <verify_address+0x1c>
+ 80006c0:	687b      	ldr	r3, [r7, #4]
+ 80006c2:	f1b3 5f00 	cmp.w	r3, #536870912	; 0x20000000
+ 80006c6:	d305      	bcc.n	80006d4 <verify_address+0x1c>
+ 80006c8:	687b      	ldr	r3, [r7, #4]
+ 80006ca:	4a0b      	ldr	r2, [pc, #44]	; (80006f8 <verify_address+0x40>)
+ 80006cc:	4293      	cmp	r3, r2
+ 80006ce:	d801      	bhi.n	80006d4 <verify_address+0x1c>
 	{
 		return ADDR_VALID;
- 80009a4:	2300      	movs	r3, #0
- 80009a6:	e00a      	b.n	80009be <verify_address+0x32>
+ 80006d0:	2300      	movs	r3, #0
+ 80006d2:	e00a      	b.n	80006ea <verify_address+0x32>
 	else if(SRAM2_BASE <= go_address && go_address <= SRAM2_END)
 	{
 		return ADDR_VALID;
 	}
 #endif
 	else if(FLASH_BASE <= go_address && go_address <= FLASH_END)
- 80009a8:	687b      	ldr	r3, [r7, #4]
- 80009aa:	f1b3 6f00 	cmp.w	r3, #134217728	; 0x8000000
- 80009ae:	d305      	bcc.n	80009bc <verify_address+0x30>
- 80009b0:	687b      	ldr	r3, [r7, #4]
- 80009b2:	4a07      	ldr	r2, [pc, #28]	; (80009d0 <verify_address+0x44>)
- 80009b4:	4293      	cmp	r3, r2
- 80009b6:	d801      	bhi.n	80009bc <verify_address+0x30>
+ 80006d4:	687b      	ldr	r3, [r7, #4]
+ 80006d6:	f1b3 6f00 	cmp.w	r3, #134217728	; 0x8000000
+ 80006da:	d305      	bcc.n	80006e8 <verify_address+0x30>
+ 80006dc:	687b      	ldr	r3, [r7, #4]
+ 80006de:	4a07      	ldr	r2, [pc, #28]	; (80006fc <verify_address+0x44>)
+ 80006e0:	4293      	cmp	r3, r2
+ 80006e2:	d801      	bhi.n	80006e8 <verify_address+0x30>
 	{
 		return ADDR_VALID;
- 80009b8:	2300      	movs	r3, #0
- 80009ba:	e000      	b.n	80009be <verify_address+0x32>
+ 80006e4:	2300      	movs	r3, #0
+ 80006e6:	e000      	b.n	80006ea <verify_address+0x32>
 		return ADDR_VALID;
 	}
 #endif
 	else
 	{
 		return ADDR_INVALID;
- 80009bc:	2301      	movs	r3, #1
+ 80006e8:	2301      	movs	r3, #1
 	}
 }
- 80009be:	4618      	mov	r0, r3
- 80009c0:	370c      	adds	r7, #12
- 80009c2:	46bd      	mov	sp, r7
- 80009c4:	f85d 7b04 	ldr.w	r7, [sp], #4
- 80009c8:	4770      	bx	lr
- 80009ca:	bf00      	nop
- 80009cc:	20018000 	.word	0x20018000
- 80009d0:	0807ffff 	.word	0x0807ffff
+ 80006ea:	4618      	mov	r0, r3
+ 80006ec:	370c      	adds	r7, #12
+ 80006ee:	46bd      	mov	sp, r7
+ 80006f0:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 80006f4:	4770      	bx	lr
+ 80006f6:	bf00      	nop
+ 80006f8:	20018000 	.word	0x20018000
+ 80006fc:	0807ffff 	.word	0x0807ffff
 
-080009d4 <execute_flash_erase>:
+08000700 <execute_flash_erase>:
 
 uint8_t execute_flash_erase(uint8_t sector_number, uint8_t no_of_sector)
 {
- 80009d4:	b580      	push	{r7, lr}
- 80009d6:	b08a      	sub	sp, #40	; 0x28
- 80009d8:	af00      	add	r7, sp, #0
- 80009da:	4603      	mov	r3, r0
- 80009dc:	460a      	mov	r2, r1
- 80009de:	71fb      	strb	r3, [r7, #7]
- 80009e0:	4613      	mov	r3, r2
- 80009e2:	71bb      	strb	r3, [r7, #6]
+ 8000700:	b580      	push	{r7, lr}
+ 8000702:	b08a      	sub	sp, #40	; 0x28
+ 8000704:	af00      	add	r7, sp, #0
+ 8000706:	4603      	mov	r3, r0
+ 8000708:	460a      	mov	r2, r1
+ 800070a:	71fb      	strb	r3, [r7, #7]
+ 800070c:	4613      	mov	r3, r2
+ 800070e:	71bb      	strb	r3, [r7, #6]
 	 * no_of_sector has to be in the range of 0 to 7
 	 * if sector_number = 0xff, that means mass erase
 	 */
 
 
 	if(no_of_sector > 8)
- 80009e4:	79bb      	ldrb	r3, [r7, #6]
- 80009e6:	2b08      	cmp	r3, #8
- 80009e8:	d901      	bls.n	80009ee <execute_flash_erase+0x1a>
+ 8000710:	79bb      	ldrb	r3, [r7, #6]
+ 8000712:	2b08      	cmp	r3, #8
+ 8000714:	d901      	bls.n	800071a <execute_flash_erase+0x1a>
 		return INVALID_SECTOR;
- 80009ea:	23ff      	movs	r3, #255	; 0xff
- 80009ec:	e035      	b.n	8000a5a <execute_flash_erase+0x86>
+ 8000716:	23ff      	movs	r3, #255	; 0xff
+ 8000718:	e035      	b.n	8000786 <execute_flash_erase+0x86>
 
 	if((sector_number == 0xff) || (sector_number <= 7))
- 80009ee:	79fb      	ldrb	r3, [r7, #7]
- 80009f0:	2bff      	cmp	r3, #255	; 0xff
- 80009f2:	d002      	beq.n	80009fa <execute_flash_erase+0x26>
- 80009f4:	79fb      	ldrb	r3, [r7, #7]
- 80009f6:	2b07      	cmp	r3, #7
- 80009f8:	d82e      	bhi.n	8000a58 <execute_flash_erase+0x84>
+ 800071a:	79fb      	ldrb	r3, [r7, #7]
+ 800071c:	2bff      	cmp	r3, #255	; 0xff
+ 800071e:	d002      	beq.n	8000726 <execute_flash_erase+0x26>
+ 8000720:	79fb      	ldrb	r3, [r7, #7]
+ 8000722:	2b07      	cmp	r3, #7
+ 8000724:	d82e      	bhi.n	8000784 <execute_flash_erase+0x84>
 	{
 		// mass erase
 		if(sector_number == (uint8_t) 0xff)
- 80009fa:	79fb      	ldrb	r3, [r7, #7]
- 80009fc:	2bff      	cmp	r3, #255	; 0xff
- 80009fe:	d102      	bne.n	8000a06 <execute_flash_erase+0x32>
+ 8000726:	79fb      	ldrb	r3, [r7, #7]
+ 8000728:	2bff      	cmp	r3, #255	; 0xff
+ 800072a:	d102      	bne.n	8000732 <execute_flash_erase+0x32>
 		{
 			flash_erase_handle.TypeErase = FLASH_TYPEERASE_MASSERASE;
- 8000a00:	2301      	movs	r3, #1
- 8000a02:	613b      	str	r3, [r7, #16]
- 8000a04:	e012      	b.n	8000a2c <execute_flash_erase+0x58>
+ 800072c:	2301      	movs	r3, #1
+ 800072e:	613b      	str	r3, [r7, #16]
+ 8000730:	e012      	b.n	8000758 <execute_flash_erase+0x58>
 		}
 		// sector erase
 		else
 		{
 			uint8_t remaining_sector = 8-sector_number;
- 8000a06:	79fb      	ldrb	r3, [r7, #7]
- 8000a08:	f1c3 0308 	rsb	r3, r3, #8
- 8000a0c:	f887 3027 	strb.w	r3, [r7, #39]	; 0x27
+ 8000732:	79fb      	ldrb	r3, [r7, #7]
+ 8000734:	f1c3 0308 	rsb	r3, r3, #8
+ 8000738:	f887 3027 	strb.w	r3, [r7, #39]	; 0x27
 			if(no_of_sector > remaining_sector)
- 8000a10:	79ba      	ldrb	r2, [r7, #6]
- 8000a12:	f897 3027 	ldrb.w	r3, [r7, #39]	; 0x27
- 8000a16:	429a      	cmp	r2, r3
- 8000a18:	d902      	bls.n	8000a20 <execute_flash_erase+0x4c>
+ 800073c:	79ba      	ldrb	r2, [r7, #6]
+ 800073e:	f897 3027 	ldrb.w	r3, [r7, #39]	; 0x27
+ 8000742:	429a      	cmp	r2, r3
+ 8000744:	d902      	bls.n	800074c <execute_flash_erase+0x4c>
 			{
 				no_of_sector = remaining_sector;
- 8000a1a:	f897 3027 	ldrb.w	r3, [r7, #39]	; 0x27
- 8000a1e:	71bb      	strb	r3, [r7, #6]
+ 8000746:	f897 3027 	ldrb.w	r3, [r7, #39]	; 0x27
+ 800074a:	71bb      	strb	r3, [r7, #6]
 			}
 			flash_erase_handle.TypeErase = FLASH_TYPEERASE_SECTORS;
- 8000a20:	2300      	movs	r3, #0
- 8000a22:	613b      	str	r3, [r7, #16]
+ 800074c:	2300      	movs	r3, #0
+ 800074e:	613b      	str	r3, [r7, #16]
 			flash_erase_handle.Sector = sector_number;		// This is the initial sector
- 8000a24:	79fb      	ldrb	r3, [r7, #7]
- 8000a26:	61bb      	str	r3, [r7, #24]
+ 8000750:	79fb      	ldrb	r3, [r7, #7]
+ 8000752:	61bb      	str	r3, [r7, #24]
 			flash_erase_handle.NbSectors = no_of_sector;
- 8000a28:	79bb      	ldrb	r3, [r7, #6]
- 8000a2a:	61fb      	str	r3, [r7, #28]
+ 8000754:	79bb      	ldrb	r3, [r7, #6]
+ 8000756:	61fb      	str	r3, [r7, #28]
 		}
 
 		flash_erase_handle.Banks = FLASH_BANK_1;
- 8000a2c:	2301      	movs	r3, #1
- 8000a2e:	617b      	str	r3, [r7, #20]
+ 8000758:	2301      	movs	r3, #1
+ 800075a:	617b      	str	r3, [r7, #20]
 
 		// Get access to touch the flash registers
 		HAL_FLASH_Unlock();
- 8000a30:	f001 f95a 	bl	8001ce8 <HAL_FLASH_Unlock>
+ 800075c:	f001 fac4 	bl	8001ce8 <HAL_FLASH_Unlock>
 		flash_erase_handle.VoltageRange = FLASH_VOLTAGE_RANGE_3;
- 8000a34:	2302      	movs	r3, #2
- 8000a36:	623b      	str	r3, [r7, #32]
+ 8000760:	2302      	movs	r3, #2
+ 8000762:	623b      	str	r3, [r7, #32]
 		status = (uint8_t) HAL_FLASHEx_Erase(&flash_erase_handle, &sectorerror);
- 8000a38:	f107 020c 	add.w	r2, r7, #12
- 8000a3c:	f107 0310 	add.w	r3, r7, #16
- 8000a40:	4611      	mov	r1, r2
- 8000a42:	4618      	mov	r0, r3
- 8000a44:	f001 faee 	bl	8002024 <HAL_FLASHEx_Erase>
- 8000a48:	4603      	mov	r3, r0
- 8000a4a:	f887 3026 	strb.w	r3, [r7, #38]	; 0x26
+ 8000764:	f107 020c 	add.w	r2, r7, #12
+ 8000768:	f107 0310 	add.w	r3, r7, #16
+ 800076c:	4611      	mov	r1, r2
+ 800076e:	4618      	mov	r0, r3
+ 8000770:	f001 fc58 	bl	8002024 <HAL_FLASHEx_Erase>
+ 8000774:	4603      	mov	r3, r0
+ 8000776:	f887 3026 	strb.w	r3, [r7, #38]	; 0x26
 		HAL_FLASH_Lock();
- 8000a4e:	f001 f96d 	bl	8001d2c <HAL_FLASH_Lock>
+ 800077a:	f001 fad7 	bl	8001d2c <HAL_FLASH_Lock>
 
 		return status;
- 8000a52:	f897 3026 	ldrb.w	r3, [r7, #38]	; 0x26
- 8000a56:	e000      	b.n	8000a5a <execute_flash_erase+0x86>
+ 800077e:	f897 3026 	ldrb.w	r3, [r7, #38]	; 0x26
+ 8000782:	e000      	b.n	8000786 <execute_flash_erase+0x86>
 	}
 
 
 	return INVALID_SECTOR;
- 8000a58:	23ff      	movs	r3, #255	; 0xff
+ 8000784:	23ff      	movs	r3, #255	; 0xff
 }
- 8000a5a:	4618      	mov	r0, r3
- 8000a5c:	3728      	adds	r7, #40	; 0x28
- 8000a5e:	46bd      	mov	sp, r7
- 8000a60:	bd80      	pop	{r7, pc}
+ 8000786:	4618      	mov	r0, r3
+ 8000788:	3728      	adds	r7, #40	; 0x28
+ 800078a:	46bd      	mov	sp, r7
+ 800078c:	bd80      	pop	{r7, pc}
 
-08000a62 <execute_mem_write>:
+0800078e <execute_mem_write>:
  *
  * Note1: Currently this function supports writing to Flash only
  * Note2: This functions does not check whether "mem_address" is a valid address of the MCU
  */
 uint8_t execute_mem_write(uint8_t *pBuffer, uint32_t mem_address, uint32_t len)
 {
- 8000a62:	b5b0      	push	{r4, r5, r7, lr}
- 8000a64:	b086      	sub	sp, #24
- 8000a66:	af00      	add	r7, sp, #0
- 8000a68:	60f8      	str	r0, [r7, #12]
- 8000a6a:	60b9      	str	r1, [r7, #8]
- 8000a6c:	607a      	str	r2, [r7, #4]
+ 800078e:	b5b0      	push	{r4, r5, r7, lr}
+ 8000790:	b086      	sub	sp, #24
+ 8000792:	af00      	add	r7, sp, #0
+ 8000794:	60f8      	str	r0, [r7, #12]
+ 8000796:	60b9      	str	r1, [r7, #8]
+ 8000798:	607a      	str	r2, [r7, #4]
 	uint8_t status = HAL_OK;
- 8000a6e:	2300      	movs	r3, #0
- 8000a70:	75fb      	strb	r3, [r7, #23]
+ 800079a:	2300      	movs	r3, #0
+ 800079c:	75fb      	strb	r3, [r7, #23]
 
 	// We have to unlock flash module to get control of the registers
 	HAL_FLASH_Unlock();
- 8000a72:	f001 f939 	bl	8001ce8 <HAL_FLASH_Unlock>
+ 800079e:	f001 faa3 	bl	8001ce8 <HAL_FLASH_Unlock>
 
 	for(uint32_t i = 0; i < len; i++)
- 8000a76:	2300      	movs	r3, #0
- 8000a78:	613b      	str	r3, [r7, #16]
- 8000a7a:	e014      	b.n	8000aa6 <execute_mem_write+0x44>
+ 80007a2:	2300      	movs	r3, #0
+ 80007a4:	613b      	str	r3, [r7, #16]
+ 80007a6:	e014      	b.n	80007d2 <execute_mem_write+0x44>
 	{
 		// Here we program the flash byte by byte
 		status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, mem_address+i, pBuffer[i]);
- 8000a7c:	68ba      	ldr	r2, [r7, #8]
- 8000a7e:	693b      	ldr	r3, [r7, #16]
- 8000a80:	18d1      	adds	r1, r2, r3
- 8000a82:	68fa      	ldr	r2, [r7, #12]
- 8000a84:	693b      	ldr	r3, [r7, #16]
- 8000a86:	4413      	add	r3, r2
- 8000a88:	781b      	ldrb	r3, [r3, #0]
- 8000a8a:	b2db      	uxtb	r3, r3
- 8000a8c:	2200      	movs	r2, #0
- 8000a8e:	461c      	mov	r4, r3
- 8000a90:	4615      	mov	r5, r2
- 8000a92:	4622      	mov	r2, r4
- 8000a94:	462b      	mov	r3, r5
- 8000a96:	2000      	movs	r0, #0
- 8000a98:	f001 f8d2 	bl	8001c40 <HAL_FLASH_Program>
- 8000a9c:	4603      	mov	r3, r0
- 8000a9e:	75fb      	strb	r3, [r7, #23]
+ 80007a8:	68ba      	ldr	r2, [r7, #8]
+ 80007aa:	693b      	ldr	r3, [r7, #16]
+ 80007ac:	18d1      	adds	r1, r2, r3
+ 80007ae:	68fa      	ldr	r2, [r7, #12]
+ 80007b0:	693b      	ldr	r3, [r7, #16]
+ 80007b2:	4413      	add	r3, r2
+ 80007b4:	781b      	ldrb	r3, [r3, #0]
+ 80007b6:	b2db      	uxtb	r3, r3
+ 80007b8:	2200      	movs	r2, #0
+ 80007ba:	461c      	mov	r4, r3
+ 80007bc:	4615      	mov	r5, r2
+ 80007be:	4622      	mov	r2, r4
+ 80007c0:	462b      	mov	r3, r5
+ 80007c2:	2000      	movs	r0, #0
+ 80007c4:	f001 fa3c 	bl	8001c40 <HAL_FLASH_Program>
+ 80007c8:	4603      	mov	r3, r0
+ 80007ca:	75fb      	strb	r3, [r7, #23]
 	for(uint32_t i = 0; i < len; i++)
- 8000aa0:	693b      	ldr	r3, [r7, #16]
- 8000aa2:	3301      	adds	r3, #1
- 8000aa4:	613b      	str	r3, [r7, #16]
- 8000aa6:	693a      	ldr	r2, [r7, #16]
- 8000aa8:	687b      	ldr	r3, [r7, #4]
- 8000aaa:	429a      	cmp	r2, r3
- 8000aac:	d3e6      	bcc.n	8000a7c <execute_mem_write+0x1a>
+ 80007cc:	693b      	ldr	r3, [r7, #16]
+ 80007ce:	3301      	adds	r3, #1
+ 80007d0:	613b      	str	r3, [r7, #16]
+ 80007d2:	693a      	ldr	r2, [r7, #16]
+ 80007d4:	687b      	ldr	r3, [r7, #4]
+ 80007d6:	429a      	cmp	r2, r3
+ 80007d8:	d3e6      	bcc.n	80007a8 <execute_mem_write+0x1a>
 	}
 
 	HAL_FLASH_Lock();
- 8000aae:	f001 f93d 	bl	8001d2c <HAL_FLASH_Lock>
+ 80007da:	f001 faa7 	bl	8001d2c <HAL_FLASH_Lock>
 
 	return status;
- 8000ab2:	7dfb      	ldrb	r3, [r7, #23]
+ 80007de:	7dfb      	ldrb	r3, [r7, #23]
 }
- 8000ab4:	4618      	mov	r0, r3
- 8000ab6:	3718      	adds	r7, #24
- 8000ab8:	46bd      	mov	sp, r7
- 8000aba:	bdb0      	pop	{r4, r5, r7, pc}
+ 80007e0:	4618      	mov	r0, r3
+ 80007e2:	3718      	adds	r7, #24
+ 80007e4:	46bd      	mov	sp, r7
+ 80007e6:	bdb0      	pop	{r4, r5, r7, pc}
 
-08000abc <execute_mem_read>:
+080007e8 <execute_mem_read>:
  *
  * Note1: Currently this function supports reading Flash only
  * Note2: This functions does not check whether "mem_address" is a valid address of the MCU
  */
 uint8_t execute_mem_read(uint8_t *pBuffer, uint32_t mem_address, uint32_t len)
 {
- 8000abc:	b5b0      	push	{r4, r5, r7, lr}
- 8000abe:	b086      	sub	sp, #24
- 8000ac0:	af00      	add	r7, sp, #0
- 8000ac2:	60f8      	str	r0, [r7, #12]
- 8000ac4:	60b9      	str	r1, [r7, #8]
- 8000ac6:	607a      	str	r2, [r7, #4]
+ 80007e8:	b5b0      	push	{r4, r5, r7, lr}
+ 80007ea:	b086      	sub	sp, #24
+ 80007ec:	af00      	add	r7, sp, #0
+ 80007ee:	60f8      	str	r0, [r7, #12]
+ 80007f0:	60b9      	str	r1, [r7, #8]
+ 80007f2:	607a      	str	r2, [r7, #4]
 	uint8_t status = HAL_OK;
- 8000ac8:	2300      	movs	r3, #0
- 8000aca:	75fb      	strb	r3, [r7, #23]
+ 80007f4:	2300      	movs	r3, #0
+ 80007f6:	75fb      	strb	r3, [r7, #23]
 
 	// We have to unlock flash module to get control of the registers
 	HAL_FLASH_Unlock();
- 8000acc:	f001 f90c 	bl	8001ce8 <HAL_FLASH_Unlock>
+ 80007f8:	f001 fa76 	bl	8001ce8 <HAL_FLASH_Unlock>
 
 	for(uint32_t i = 0; i < len; i++)
- 8000ad0:	2300      	movs	r3, #0
- 8000ad2:	613b      	str	r3, [r7, #16]
- 8000ad4:	e014      	b.n	8000b00 <execute_mem_read+0x44>
+ 80007fc:	2300      	movs	r3, #0
+ 80007fe:	613b      	str	r3, [r7, #16]
+ 8000800:	e014      	b.n	800082c <execute_mem_read+0x44>
 	{
 		// Here we program the flash byte by byte
 		status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, mem_address+i, pBuffer[i]);
- 8000ad6:	68ba      	ldr	r2, [r7, #8]
- 8000ad8:	693b      	ldr	r3, [r7, #16]
- 8000ada:	18d1      	adds	r1, r2, r3
- 8000adc:	68fa      	ldr	r2, [r7, #12]
- 8000ade:	693b      	ldr	r3, [r7, #16]
- 8000ae0:	4413      	add	r3, r2
- 8000ae2:	781b      	ldrb	r3, [r3, #0]
- 8000ae4:	b2db      	uxtb	r3, r3
- 8000ae6:	2200      	movs	r2, #0
- 8000ae8:	461c      	mov	r4, r3
- 8000aea:	4615      	mov	r5, r2
- 8000aec:	4622      	mov	r2, r4
- 8000aee:	462b      	mov	r3, r5
- 8000af0:	2000      	movs	r0, #0
- 8000af2:	f001 f8a5 	bl	8001c40 <HAL_FLASH_Program>
- 8000af6:	4603      	mov	r3, r0
- 8000af8:	75fb      	strb	r3, [r7, #23]
+ 8000802:	68ba      	ldr	r2, [r7, #8]
+ 8000804:	693b      	ldr	r3, [r7, #16]
+ 8000806:	18d1      	adds	r1, r2, r3
+ 8000808:	68fa      	ldr	r2, [r7, #12]
+ 800080a:	693b      	ldr	r3, [r7, #16]
+ 800080c:	4413      	add	r3, r2
+ 800080e:	781b      	ldrb	r3, [r3, #0]
+ 8000810:	b2db      	uxtb	r3, r3
+ 8000812:	2200      	movs	r2, #0
+ 8000814:	461c      	mov	r4, r3
+ 8000816:	4615      	mov	r5, r2
+ 8000818:	4622      	mov	r2, r4
+ 800081a:	462b      	mov	r3, r5
+ 800081c:	2000      	movs	r0, #0
+ 800081e:	f001 fa0f 	bl	8001c40 <HAL_FLASH_Program>
+ 8000822:	4603      	mov	r3, r0
+ 8000824:	75fb      	strb	r3, [r7, #23]
 	for(uint32_t i = 0; i < len; i++)
- 8000afa:	693b      	ldr	r3, [r7, #16]
- 8000afc:	3301      	adds	r3, #1
- 8000afe:	613b      	str	r3, [r7, #16]
- 8000b00:	693a      	ldr	r2, [r7, #16]
- 8000b02:	687b      	ldr	r3, [r7, #4]
- 8000b04:	429a      	cmp	r2, r3
- 8000b06:	d3e6      	bcc.n	8000ad6 <execute_mem_read+0x1a>
+ 8000826:	693b      	ldr	r3, [r7, #16]
+ 8000828:	3301      	adds	r3, #1
+ 800082a:	613b      	str	r3, [r7, #16]
+ 800082c:	693a      	ldr	r2, [r7, #16]
+ 800082e:	687b      	ldr	r3, [r7, #4]
+ 8000830:	429a      	cmp	r2, r3
+ 8000832:	d3e6      	bcc.n	8000802 <execute_mem_read+0x1a>
 
 	}
 
 	HAL_FLASH_Lock();
- 8000b08:	f001 f910 	bl	8001d2c <HAL_FLASH_Lock>
+ 8000834:	f001 fa7a 	bl	8001d2c <HAL_FLASH_Lock>
 
 	return status;
- 8000b0c:	7dfb      	ldrb	r3, [r7, #23]
+ 8000838:	7dfb      	ldrb	r3, [r7, #23]
 }
- 8000b0e:	4618      	mov	r0, r3
- 8000b10:	3718      	adds	r7, #24
- 8000b12:	46bd      	mov	sp, r7
- 8000b14:	bdb0      	pop	{r4, r5, r7, pc}
+ 800083a:	4618      	mov	r0, r3
+ 800083c:	3718      	adds	r7, #24
+ 800083e:	46bd      	mov	sp, r7
+ 8000840:	bdb0      	pop	{r4, r5, r7, pc}
 	...
 
-08000b18 <configure_flash_sector_rw_protection>:
+08000844 <configure_flash_sector_rw_protection>:
  * 3. Set the option start bit (OPTSTRT) in the FLASH_OPTCR register
  * 4. Wait got the BSY bit to be cleared
  *
  */
 uint8_t configure_flash_sector_rw_protection(uint8_t sector_details, uint8_t protection_mode, uint8_t disable)
 {
- 8000b18:	b580      	push	{r7, lr}
- 8000b1a:	b084      	sub	sp, #16
- 8000b1c:	af00      	add	r7, sp, #0
- 8000b1e:	4603      	mov	r3, r0
- 8000b20:	71fb      	strb	r3, [r7, #7]
- 8000b22:	460b      	mov	r3, r1
- 8000b24:	71bb      	strb	r3, [r7, #6]
- 8000b26:	4613      	mov	r3, r2
- 8000b28:	717b      	strb	r3, [r7, #5]
+ 8000844:	b580      	push	{r7, lr}
+ 8000846:	b084      	sub	sp, #16
+ 8000848:	af00      	add	r7, sp, #0
+ 800084a:	4603      	mov	r3, r0
+ 800084c:	71fb      	strb	r3, [r7, #7]
+ 800084e:	460b      	mov	r3, r1
+ 8000850:	71bb      	strb	r3, [r7, #6]
+ 8000852:	4613      	mov	r3, r2
+ 8000854:	717b      	strb	r3, [r7, #5]
 	 * According to RM of stm32f401 TABLE 9, we have to modify the address
 	 *  0x1FFF c008 bit 15 (SPRMOD)
 	 */
 
 	// Flash option control register (OPTCR)
 	volatile uint32_t *pOPTCR = (uint32_t*)0x40023C14;
- 8000b2a:	4b44      	ldr	r3, [pc, #272]	; (8000c3c <configure_flash_sector_rw_protection+0x124>)
- 8000b2c:	60fb      	str	r3, [r7, #12]
+ 8000856:	4b44      	ldr	r3, [pc, #272]	; (8000968 <configure_flash_sector_rw_protection+0x124>)
+ 8000858:	60fb      	str	r3, [r7, #12]
 
 	if(disable)
- 8000b2e:	797b      	ldrb	r3, [r7, #5]
- 8000b30:	2b00      	cmp	r3, #0
- 8000b32:	d025      	beq.n	8000b80 <configure_flash_sector_rw_protection+0x68>
+ 800085a:	797b      	ldrb	r3, [r7, #5]
+ 800085c:	2b00      	cmp	r3, #0
+ 800085e:	d025      	beq.n	80008ac <configure_flash_sector_rw_protection+0x68>
 	{
 		//disable all r/w protection on sectors
 
 		//option byte configuration unlock
 		HAL_FLASH_OB_Unlock();
- 8000b34:	f001 f90a 	bl	8001d4c <HAL_FLASH_OB_Unlock>
+ 8000860:	f001 fa74 	bl	8001d4c <HAL_FLASH_OB_Unlock>
 
 		//wait till no active operation on flash
 		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
- 8000b38:	bf00      	nop
- 8000b3a:	4b41      	ldr	r3, [pc, #260]	; (8000c40 <configure_flash_sector_rw_protection+0x128>)
- 8000b3c:	68db      	ldr	r3, [r3, #12]
- 8000b3e:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
- 8000b42:	2b00      	cmp	r3, #0
- 8000b44:	d1f9      	bne.n	8000b3a <configure_flash_sector_rw_protection+0x22>
+ 8000864:	bf00      	nop
+ 8000866:	4b41      	ldr	r3, [pc, #260]	; (800096c <configure_flash_sector_rw_protection+0x128>)
+ 8000868:	68db      	ldr	r3, [r3, #12]
+ 800086a:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
+ 800086e:	2b00      	cmp	r3, #0
+ 8000870:	d1f9      	bne.n	8000866 <configure_flash_sector_rw_protection+0x22>
 
 		//clear the 31st bit (default state)
 		//please refer: flash option control register (FLASH_OPTCR) in user manual
 		*pOPTCR &= ~(1 << 31);
- 8000b46:	68fb      	ldr	r3, [r7, #12]
- 8000b48:	681b      	ldr	r3, [r3, #0]
- 8000b4a:	f023 4200 	bic.w	r2, r3, #2147483648	; 0x80000000
- 8000b4e:	68fb      	ldr	r3, [r7, #12]
- 8000b50:	601a      	str	r2, [r3, #0]
+ 8000872:	68fb      	ldr	r3, [r7, #12]
+ 8000874:	681b      	ldr	r3, [r3, #0]
+ 8000876:	f023 4200 	bic.w	r2, r3, #2147483648	; 0x80000000
+ 800087a:	68fb      	ldr	r3, [r7, #12]
+ 800087c:	601a      	str	r2, [r3, #0]
 
 		//clear the protection: make all bits belonging to sector as
 		*pOPTCR |= (0xFF << 16);
- 8000b52:	68fb      	ldr	r3, [r7, #12]
- 8000b54:	681b      	ldr	r3, [r3, #0]
- 8000b56:	f443 027f 	orr.w	r2, r3, #16711680	; 0xff0000
- 8000b5a:	68fb      	ldr	r3, [r7, #12]
- 8000b5c:	601a      	str	r2, [r3, #0]
+ 800087e:	68fb      	ldr	r3, [r7, #12]
+ 8000880:	681b      	ldr	r3, [r3, #0]
+ 8000882:	f443 027f 	orr.w	r2, r3, #16711680	; 0xff0000
+ 8000886:	68fb      	ldr	r3, [r7, #12]
+ 8000888:	601a      	str	r2, [r3, #0]
 
 		//set the option start bit (OPTSTRT) in the FLASH_OPTCR register
 		*pOPTCR |= (1 << 1);
- 8000b5e:	68fb      	ldr	r3, [r7, #12]
- 8000b60:	681b      	ldr	r3, [r3, #0]
- 8000b62:	f043 0202 	orr.w	r2, r3, #2
- 8000b66:	68fb      	ldr	r3, [r7, #12]
- 8000b68:	601a      	str	r2, [r3, #0]
+ 800088a:	68fb      	ldr	r3, [r7, #12]
+ 800088c:	681b      	ldr	r3, [r3, #0]
+ 800088e:	f043 0202 	orr.w	r2, r3, #2
+ 8000892:	68fb      	ldr	r3, [r7, #12]
+ 8000894:	601a      	str	r2, [r3, #0]
 
 		//wait till no active operation on flash
 		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
- 8000b6a:	bf00      	nop
- 8000b6c:	4b34      	ldr	r3, [pc, #208]	; (8000c40 <configure_flash_sector_rw_protection+0x128>)
- 8000b6e:	68db      	ldr	r3, [r3, #12]
- 8000b70:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
- 8000b74:	2b00      	cmp	r3, #0
- 8000b76:	d1f9      	bne.n	8000b6c <configure_flash_sector_rw_protection+0x54>
+ 8000896:	bf00      	nop
+ 8000898:	4b34      	ldr	r3, [pc, #208]	; (800096c <configure_flash_sector_rw_protection+0x128>)
+ 800089a:	68db      	ldr	r3, [r3, #12]
+ 800089c:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
+ 80008a0:	2b00      	cmp	r3, #0
+ 80008a2:	d1f9      	bne.n	8000898 <configure_flash_sector_rw_protection+0x54>
 
 		HAL_FLASH_OB_Lock();
- 8000b78:	f001 f904 	bl	8001d84 <HAL_FLASH_OB_Lock>
+ 80008a4:	f001 fa6e 	bl	8001d84 <HAL_FLASH_OB_Lock>
 
 		return 0;
- 8000b7c:	2300      	movs	r3, #0
- 8000b7e:	e058      	b.n	8000c32 <configure_flash_sector_rw_protection+0x11a>
+ 80008a8:	2300      	movs	r3, #0
+ 80008aa:	e058      	b.n	800095e <configure_flash_sector_rw_protection+0x11a>
 	}
 
 	if(protection_mode == (uint8_t)1)
- 8000b80:	79bb      	ldrb	r3, [r7, #6]
- 8000b82:	2b01      	cmp	r3, #1
- 8000b84:	d126      	bne.n	8000bd4 <configure_flash_sector_rw_protection+0xbc>
+ 80008ac:	79bb      	ldrb	r3, [r7, #6]
+ 80008ae:	2b01      	cmp	r3, #1
+ 80008b0:	d126      	bne.n	8000900 <configure_flash_sector_rw_protection+0xbc>
 	{
 		//Option byte configuration unlock
 		HAL_FLASH_OB_Unlock();
- 8000b86:	f001 f8e1 	bl	8001d4c <HAL_FLASH_OB_Unlock>
+ 80008b2:	f001 fa4b 	bl	8001d4c <HAL_FLASH_OB_Unlock>
 
 		//wait till no active operation on flash
 		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY)!=RESET);
- 8000b8a:	bf00      	nop
- 8000b8c:	4b2c      	ldr	r3, [pc, #176]	; (8000c40 <configure_flash_sector_rw_protection+0x128>)
- 8000b8e:	68db      	ldr	r3, [r3, #12]
- 8000b90:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
- 8000b94:	2b00      	cmp	r3, #0
- 8000b96:	d1f9      	bne.n	8000b8c <configure_flash_sector_rw_protection+0x74>
+ 80008b6:	bf00      	nop
+ 80008b8:	4b2c      	ldr	r3, [pc, #176]	; (800096c <configure_flash_sector_rw_protection+0x128>)
+ 80008ba:	68db      	ldr	r3, [r3, #12]
+ 80008bc:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
+ 80008c0:	2b00      	cmp	r3, #0
+ 80008c2:	d1f9      	bne.n	80008b8 <configure_flash_sector_rw_protection+0x74>
 
 		//here we are setting just write protection for the sectors
 		//clear the 31th bit
 		//please refer: FLASH option control register (FLASH_OPTCR) in RM
 		*pOPTCR &= ~(1 << 31);
- 8000b98:	68fb      	ldr	r3, [r7, #12]
- 8000b9a:	681b      	ldr	r3, [r3, #0]
- 8000b9c:	f023 4200 	bic.w	r2, r3, #2147483648	; 0x80000000
- 8000ba0:	68fb      	ldr	r3, [r7, #12]
- 8000ba2:	601a      	str	r2, [r3, #0]
+ 80008c4:	68fb      	ldr	r3, [r7, #12]
+ 80008c6:	681b      	ldr	r3, [r3, #0]
+ 80008c8:	f023 4200 	bic.w	r2, r3, #2147483648	; 0x80000000
+ 80008cc:	68fb      	ldr	r3, [r7, #12]
+ 80008ce:	601a      	str	r2, [r3, #0]
 
 		//put write protection on sectors
 		*pOPTCR &= ~(sector_details << 16);
- 8000ba4:	68fb      	ldr	r3, [r7, #12]
- 8000ba6:	681b      	ldr	r3, [r3, #0]
- 8000ba8:	79fa      	ldrb	r2, [r7, #7]
- 8000baa:	0412      	lsls	r2, r2, #16
- 8000bac:	43d2      	mvns	r2, r2
- 8000bae:	401a      	ands	r2, r3
- 8000bb0:	68fb      	ldr	r3, [r7, #12]
- 8000bb2:	601a      	str	r2, [r3, #0]
+ 80008d0:	68fb      	ldr	r3, [r7, #12]
+ 80008d2:	681b      	ldr	r3, [r3, #0]
+ 80008d4:	79fa      	ldrb	r2, [r7, #7]
+ 80008d6:	0412      	lsls	r2, r2, #16
+ 80008d8:	43d2      	mvns	r2, r2
+ 80008da:	401a      	ands	r2, r3
+ 80008dc:	68fb      	ldr	r3, [r7, #12]
+ 80008de:	601a      	str	r2, [r3, #0]
 
 		//Set the option start bit (OPTSTRT) in the FLASH_OPTCR register
 		*pOPTCR |= (1 << 1);
- 8000bb4:	68fb      	ldr	r3, [r7, #12]
- 8000bb6:	681b      	ldr	r3, [r3, #0]
- 8000bb8:	f043 0202 	orr.w	r2, r3, #2
- 8000bbc:	68fb      	ldr	r3, [r7, #12]
- 8000bbe:	601a      	str	r2, [r3, #0]
+ 80008e0:	68fb      	ldr	r3, [r7, #12]
+ 80008e2:	681b      	ldr	r3, [r3, #0]
+ 80008e4:	f043 0202 	orr.w	r2, r3, #2
+ 80008e8:	68fb      	ldr	r3, [r7, #12]
+ 80008ea:	601a      	str	r2, [r3, #0]
 
 		//wait till no active operation on flash
 		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY)!=RESET);
- 8000bc0:	bf00      	nop
- 8000bc2:	4b1f      	ldr	r3, [pc, #124]	; (8000c40 <configure_flash_sector_rw_protection+0x128>)
- 8000bc4:	68db      	ldr	r3, [r3, #12]
- 8000bc6:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
- 8000bca:	2b00      	cmp	r3, #0
- 8000bcc:	d1f9      	bne.n	8000bc2 <configure_flash_sector_rw_protection+0xaa>
+ 80008ec:	bf00      	nop
+ 80008ee:	4b1f      	ldr	r3, [pc, #124]	; (800096c <configure_flash_sector_rw_protection+0x128>)
+ 80008f0:	68db      	ldr	r3, [r3, #12]
+ 80008f2:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
+ 80008f6:	2b00      	cmp	r3, #0
+ 80008f8:	d1f9      	bne.n	80008ee <configure_flash_sector_rw_protection+0xaa>
 
 		HAL_FLASH_OB_Lock();
- 8000bce:	f001 f8d9 	bl	8001d84 <HAL_FLASH_OB_Lock>
- 8000bd2:	e02d      	b.n	8000c30 <configure_flash_sector_rw_protection+0x118>
+ 80008fa:	f001 fa43 	bl	8001d84 <HAL_FLASH_OB_Lock>
+ 80008fe:	e02d      	b.n	800095c <configure_flash_sector_rw_protection+0x118>
 	}
 	else if(protection_mode == (uint8_t)2)
- 8000bd4:	79bb      	ldrb	r3, [r7, #6]
- 8000bd6:	2b02      	cmp	r3, #2
- 8000bd8:	d12a      	bne.n	8000c30 <configure_flash_sector_rw_protection+0x118>
+ 8000900:	79bb      	ldrb	r3, [r7, #6]
+ 8000902:	2b02      	cmp	r3, #2
+ 8000904:	d12a      	bne.n	800095c <configure_flash_sector_rw_protection+0x118>
 	{
 		//option byte configuration unlock
 		HAL_FLASH_OB_Unlock();
- 8000bda:	f001 f8b7 	bl	8001d4c <HAL_FLASH_OB_Unlock>
+ 8000906:	f001 fa21 	bl	8001d4c <HAL_FLASH_OB_Unlock>
 
 		//wait till no active operation on flash
 		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
- 8000bde:	bf00      	nop
- 8000be0:	4b17      	ldr	r3, [pc, #92]	; (8000c40 <configure_flash_sector_rw_protection+0x128>)
- 8000be2:	68db      	ldr	r3, [r3, #12]
- 8000be4:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
- 8000be8:	2b00      	cmp	r3, #0
- 8000bea:	d1f9      	bne.n	8000be0 <configure_flash_sector_rw_protection+0xc8>
+ 800090a:	bf00      	nop
+ 800090c:	4b17      	ldr	r3, [pc, #92]	; (800096c <configure_flash_sector_rw_protection+0x128>)
+ 800090e:	68db      	ldr	r3, [r3, #12]
+ 8000910:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
+ 8000914:	2b00      	cmp	r3, #0
+ 8000916:	d1f9      	bne.n	800090c <configure_flash_sector_rw_protection+0xc8>
 
 		//here we are setting read and write protection for the sectors
 		//set the 31th bit
 		//please refer: Flash option control register (FLASH_OPTCR) in RM
 		*pOPTCR |= (1 << 31);
- 8000bec:	68fb      	ldr	r3, [r7, #12]
- 8000bee:	681b      	ldr	r3, [r3, #0]
- 8000bf0:	f043 4200 	orr.w	r2, r3, #2147483648	; 0x80000000
- 8000bf4:	68fb      	ldr	r3, [r7, #12]
- 8000bf6:	601a      	str	r2, [r3, #0]
+ 8000918:	68fb      	ldr	r3, [r7, #12]
+ 800091a:	681b      	ldr	r3, [r3, #0]
+ 800091c:	f043 4200 	orr.w	r2, r3, #2147483648	; 0x80000000
+ 8000920:	68fb      	ldr	r3, [r7, #12]
+ 8000922:	601a      	str	r2, [r3, #0]
 
 		//put read and write protection on sectors
 		*pOPTCR &= ~(0xff << 16);
- 8000bf8:	68fb      	ldr	r3, [r7, #12]
- 8000bfa:	681b      	ldr	r3, [r3, #0]
- 8000bfc:	f423 027f 	bic.w	r2, r3, #16711680	; 0xff0000
- 8000c00:	68fb      	ldr	r3, [r7, #12]
- 8000c02:	601a      	str	r2, [r3, #0]
+ 8000924:	68fb      	ldr	r3, [r7, #12]
+ 8000926:	681b      	ldr	r3, [r3, #0]
+ 8000928:	f423 027f 	bic.w	r2, r3, #16711680	; 0xff0000
+ 800092c:	68fb      	ldr	r3, [r7, #12]
+ 800092e:	601a      	str	r2, [r3, #0]
 		*pOPTCR |= (sector_details << 16);
- 8000c04:	68fb      	ldr	r3, [r7, #12]
- 8000c06:	681b      	ldr	r3, [r3, #0]
- 8000c08:	79fa      	ldrb	r2, [r7, #7]
- 8000c0a:	0412      	lsls	r2, r2, #16
- 8000c0c:	431a      	orrs	r2, r3
- 8000c0e:	68fb      	ldr	r3, [r7, #12]
- 8000c10:	601a      	str	r2, [r3, #0]
+ 8000930:	68fb      	ldr	r3, [r7, #12]
+ 8000932:	681b      	ldr	r3, [r3, #0]
+ 8000934:	79fa      	ldrb	r2, [r7, #7]
+ 8000936:	0412      	lsls	r2, r2, #16
+ 8000938:	431a      	orrs	r2, r3
+ 800093a:	68fb      	ldr	r3, [r7, #12]
+ 800093c:	601a      	str	r2, [r3, #0]
 
 		//set the option start bit (OPTSTRT) in the FLASH_OPTCR register
 		*pOPTCR |= (1 << 1);
- 8000c12:	68fb      	ldr	r3, [r7, #12]
- 8000c14:	681b      	ldr	r3, [r3, #0]
- 8000c16:	f043 0202 	orr.w	r2, r3, #2
- 8000c1a:	68fb      	ldr	r3, [r7, #12]
- 8000c1c:	601a      	str	r2, [r3, #0]
+ 800093e:	68fb      	ldr	r3, [r7, #12]
+ 8000940:	681b      	ldr	r3, [r3, #0]
+ 8000942:	f043 0202 	orr.w	r2, r3, #2
+ 8000946:	68fb      	ldr	r3, [r7, #12]
+ 8000948:	601a      	str	r2, [r3, #0]
 
 		//wait till no active operation on flash
 		while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
- 8000c1e:	bf00      	nop
- 8000c20:	4b07      	ldr	r3, [pc, #28]	; (8000c40 <configure_flash_sector_rw_protection+0x128>)
- 8000c22:	68db      	ldr	r3, [r3, #12]
- 8000c24:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
- 8000c28:	2b00      	cmp	r3, #0
- 8000c2a:	d1f9      	bne.n	8000c20 <configure_flash_sector_rw_protection+0x108>
+ 800094a:	bf00      	nop
+ 800094c:	4b07      	ldr	r3, [pc, #28]	; (800096c <configure_flash_sector_rw_protection+0x128>)
+ 800094e:	68db      	ldr	r3, [r3, #12]
+ 8000950:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
+ 8000954:	2b00      	cmp	r3, #0
+ 8000956:	d1f9      	bne.n	800094c <configure_flash_sector_rw_protection+0x108>
 
 		HAL_FLASH_OB_Lock();
- 8000c2c:	f001 f8aa 	bl	8001d84 <HAL_FLASH_OB_Lock>
+ 8000958:	f001 fa14 	bl	8001d84 <HAL_FLASH_OB_Lock>
 	}
 
 	return 0;
- 8000c30:	2300      	movs	r3, #0
+ 800095c:	2300      	movs	r3, #0
 }
- 8000c32:	4618      	mov	r0, r3
- 8000c34:	3710      	adds	r7, #16
- 8000c36:	46bd      	mov	sp, r7
- 8000c38:	bd80      	pop	{r7, pc}
- 8000c3a:	bf00      	nop
- 8000c3c:	40023c14 	.word	0x40023c14
- 8000c40:	40023c00 	.word	0x40023c00
+ 800095e:	4618      	mov	r0, r3
+ 8000960:	3710      	adds	r7, #16
+ 8000962:	46bd      	mov	sp, r7
+ 8000964:	bd80      	pop	{r7, pc}
+ 8000966:	bf00      	nop
+ 8000968:	40023c14 	.word	0x40023c14
+ 800096c:	40023c00 	.word	0x40023c00
 
-08000c44 <read_flash_sector_rw_protection>:
+08000970 <read_flash_sector_rw_protection>:
 
 uint16_t read_flash_sector_rw_protection()
 {
- 8000c44:	b580      	push	{r7, lr}
- 8000c46:	b082      	sub	sp, #8
- 8000c48:	af00      	add	r7, sp, #0
+ 8000970:	b580      	push	{r7, lr}
+ 8000972:	b082      	sub	sp, #8
+ 8000974:	af00      	add	r7, sp, #0
 	uint16_t status = 0x00;
- 8000c4a:	2300      	movs	r3, #0
- 8000c4c:	80fb      	strh	r3, [r7, #6]
+ 8000976:	2300      	movs	r3, #0
+ 8000978:	80fb      	strh	r3, [r7, #6]
 
 	// Flash option control register (OPTCR)
 	volatile uint32_t *pOPTCR = (uint32_t*)0x40023C14;
- 8000c4e:	4b1a      	ldr	r3, [pc, #104]	; (8000cb8 <read_flash_sector_rw_protection+0x74>)
- 8000c50:	603b      	str	r3, [r7, #0]
+ 800097a:	4b1a      	ldr	r3, [pc, #104]	; (80009e4 <read_flash_sector_rw_protection+0x74>)
+ 800097c:	603b      	str	r3, [r7, #0]
 
 	//option byte configuration unlock
 	HAL_FLASH_OB_Unlock();
- 8000c52:	f001 f87b 	bl	8001d4c <HAL_FLASH_OB_Unlock>
+ 800097e:	f001 f9e5 	bl	8001d4c <HAL_FLASH_OB_Unlock>
 
 	//wait till no active operation on flash
 	while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
- 8000c56:	bf00      	nop
- 8000c58:	4b18      	ldr	r3, [pc, #96]	; (8000cbc <read_flash_sector_rw_protection+0x78>)
- 8000c5a:	68db      	ldr	r3, [r3, #12]
- 8000c5c:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
- 8000c60:	2b00      	cmp	r3, #0
- 8000c62:	d1f9      	bne.n	8000c58 <read_flash_sector_rw_protection+0x14>
+ 8000982:	bf00      	nop
+ 8000984:	4b18      	ldr	r3, [pc, #96]	; (80009e8 <read_flash_sector_rw_protection+0x78>)
+ 8000986:	68db      	ldr	r3, [r3, #12]
+ 8000988:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
+ 800098c:	2b00      	cmp	r3, #0
+ 800098e:	d1f9      	bne.n	8000984 <read_flash_sector_rw_protection+0x14>
 
 	//read the 31st bit (default state)
 	//please refer: flash option control register (FLASH_OPTCR) in user manual
 	status |= (uint16_t)((*pOPTCR & (1 << 31)) >> 16);
- 8000c64:	683b      	ldr	r3, [r7, #0]
- 8000c66:	681b      	ldr	r3, [r3, #0]
- 8000c68:	0c1b      	lsrs	r3, r3, #16
- 8000c6a:	b29b      	uxth	r3, r3
- 8000c6c:	f423 43ff 	bic.w	r3, r3, #32640	; 0x7f80
- 8000c70:	f023 037f 	bic.w	r3, r3, #127	; 0x7f
- 8000c74:	b29a      	uxth	r2, r3
- 8000c76:	88fb      	ldrh	r3, [r7, #6]
- 8000c78:	4313      	orrs	r3, r2
- 8000c7a:	80fb      	strh	r3, [r7, #6]
+ 8000990:	683b      	ldr	r3, [r7, #0]
+ 8000992:	681b      	ldr	r3, [r3, #0]
+ 8000994:	0c1b      	lsrs	r3, r3, #16
+ 8000996:	b29b      	uxth	r3, r3
+ 8000998:	f423 43ff 	bic.w	r3, r3, #32640	; 0x7f80
+ 800099c:	f023 037f 	bic.w	r3, r3, #127	; 0x7f
+ 80009a0:	b29a      	uxth	r2, r3
+ 80009a2:	88fb      	ldrh	r3, [r7, #6]
+ 80009a4:	4313      	orrs	r3, r2
+ 80009a6:	80fb      	strh	r3, [r7, #6]
 
 	//clear the protection: make all bits belonging to sector as
 	status |= (uint16_t)(((0xFF<<16) & *pOPTCR)>>16);
- 8000c7c:	683b      	ldr	r3, [r7, #0]
- 8000c7e:	681b      	ldr	r3, [r3, #0]
- 8000c80:	0c1b      	lsrs	r3, r3, #16
- 8000c82:	b29b      	uxth	r3, r3
- 8000c84:	b2db      	uxtb	r3, r3
- 8000c86:	b29a      	uxth	r2, r3
- 8000c88:	88fb      	ldrh	r3, [r7, #6]
- 8000c8a:	4313      	orrs	r3, r2
- 8000c8c:	80fb      	strh	r3, [r7, #6]
+ 80009a8:	683b      	ldr	r3, [r7, #0]
+ 80009aa:	681b      	ldr	r3, [r3, #0]
+ 80009ac:	0c1b      	lsrs	r3, r3, #16
+ 80009ae:	b29b      	uxth	r3, r3
+ 80009b0:	b2db      	uxtb	r3, r3
+ 80009b2:	b29a      	uxth	r2, r3
+ 80009b4:	88fb      	ldrh	r3, [r7, #6]
+ 80009b6:	4313      	orrs	r3, r2
+ 80009b8:	80fb      	strh	r3, [r7, #6]
 
 	//set the option start bit (OPTSTRT) in the FLASH_OPTCR register
 	*pOPTCR |= (1 << 1);
- 8000c8e:	683b      	ldr	r3, [r7, #0]
- 8000c90:	681b      	ldr	r3, [r3, #0]
- 8000c92:	f043 0202 	orr.w	r2, r3, #2
- 8000c96:	683b      	ldr	r3, [r7, #0]
- 8000c98:	601a      	str	r2, [r3, #0]
+ 80009ba:	683b      	ldr	r3, [r7, #0]
+ 80009bc:	681b      	ldr	r3, [r3, #0]
+ 80009be:	f043 0202 	orr.w	r2, r3, #2
+ 80009c2:	683b      	ldr	r3, [r7, #0]
+ 80009c4:	601a      	str	r2, [r3, #0]
 
 	//wait till no active operation on flash
 	while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY) != RESET);
- 8000c9a:	bf00      	nop
- 8000c9c:	4b07      	ldr	r3, [pc, #28]	; (8000cbc <read_flash_sector_rw_protection+0x78>)
- 8000c9e:	68db      	ldr	r3, [r3, #12]
- 8000ca0:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
- 8000ca4:	2b00      	cmp	r3, #0
- 8000ca6:	d1f9      	bne.n	8000c9c <read_flash_sector_rw_protection+0x58>
+ 80009c6:	bf00      	nop
+ 80009c8:	4b07      	ldr	r3, [pc, #28]	; (80009e8 <read_flash_sector_rw_protection+0x78>)
+ 80009ca:	68db      	ldr	r3, [r3, #12]
+ 80009cc:	f403 3380 	and.w	r3, r3, #65536	; 0x10000
+ 80009d0:	2b00      	cmp	r3, #0
+ 80009d2:	d1f9      	bne.n	80009c8 <read_flash_sector_rw_protection+0x58>
 
 	HAL_FLASH_OB_Lock();
- 8000ca8:	f001 f86c 	bl	8001d84 <HAL_FLASH_OB_Lock>
+ 80009d4:	f001 f9d6 	bl	8001d84 <HAL_FLASH_OB_Lock>
 
 
 
 	return status;
- 8000cac:	88fb      	ldrh	r3, [r7, #6]
+ 80009d8:	88fb      	ldrh	r3, [r7, #6]
 }
- 8000cae:	4618      	mov	r0, r3
- 8000cb0:	3708      	adds	r7, #8
- 8000cb2:	46bd      	mov	sp, r7
- 8000cb4:	bd80      	pop	{r7, pc}
- 8000cb6:	bf00      	nop
- 8000cb8:	40023c14 	.word	0x40023c14
- 8000cbc:	40023c00 	.word	0x40023c00
+ 80009da:	4618      	mov	r0, r3
+ 80009dc:	3708      	adds	r7, #8
+ 80009de:	46bd      	mov	sp, r7
+ 80009e0:	bd80      	pop	{r7, pc}
+ 80009e2:	bf00      	nop
+ 80009e4:	40023c14 	.word	0x40023c14
+ 80009e8:	40023c00 	.word	0x40023c00
 
-08000cc0 <bootloader_uart_write_data>:
+080009ec <bootloader_uart_write_data>:
 
 void bootloader_uart_write_data(uint8_t *pBuffer, uint32_t len)
 {
- 8000cc0:	b580      	push	{r7, lr}
- 8000cc2:	b082      	sub	sp, #8
- 8000cc4:	af00      	add	r7, sp, #0
- 8000cc6:	6078      	str	r0, [r7, #4]
- 8000cc8:	6039      	str	r1, [r7, #0]
+ 80009ec:	b580      	push	{r7, lr}
+ 80009ee:	b082      	sub	sp, #8
+ 80009f0:	af00      	add	r7, sp, #0
+ 80009f2:	6078      	str	r0, [r7, #4]
+ 80009f4:	6039      	str	r1, [r7, #0]
 	HAL_UART_Transmit(C_UART,pBuffer,len,HAL_MAX_DELAY);
- 8000cca:	683b      	ldr	r3, [r7, #0]
- 8000ccc:	b29a      	uxth	r2, r3
- 8000cce:	f04f 33ff 	mov.w	r3, #4294967295
- 8000cd2:	6879      	ldr	r1, [r7, #4]
- 8000cd4:	4803      	ldr	r0, [pc, #12]	; (8000ce4 <bootloader_uart_write_data+0x24>)
- 8000cd6:	f002 f9d2 	bl	800307e <HAL_UART_Transmit>
+ 80009f6:	683b      	ldr	r3, [r7, #0]
+ 80009f8:	b29a      	uxth	r2, r3
+ 80009fa:	f04f 33ff 	mov.w	r3, #4294967295
+ 80009fe:	6879      	ldr	r1, [r7, #4]
+ 8000a00:	4803      	ldr	r0, [pc, #12]	; (8000a10 <bootloader_uart_write_data+0x24>)
+ 8000a02:	f002 fb3c 	bl	800307e <HAL_UART_Transmit>
 }
- 8000cda:	bf00      	nop
- 8000cdc:	3708      	adds	r7, #8
- 8000cde:	46bd      	mov	sp, r7
- 8000ce0:	bd80      	pop	{r7, pc}
- 8000ce2:	bf00      	nop
- 8000ce4:	200000e4 	.word	0x200000e4
+ 8000a06:	bf00      	nop
+ 8000a08:	3708      	adds	r7, #8
+ 8000a0a:	46bd      	mov	sp, r7
+ 8000a0c:	bd80      	pop	{r7, pc}
+ 8000a0e:	bf00      	nop
+ 8000a10:	200001ac 	.word	0x200001ac
 
-08000ce8 <printmsg>:
+08000a14 <printmsg>:
 
 
 void printmsg(char *format, ...)
 {
- 8000ce8:	b40f      	push	{r0, r1, r2, r3}
- 8000cea:	b580      	push	{r7, lr}
- 8000cec:	b096      	sub	sp, #88	; 0x58
- 8000cee:	af00      	add	r7, sp, #0
+ 8000a14:	b40f      	push	{r0, r1, r2, r3}
+ 8000a16:	b580      	push	{r7, lr}
+ 8000a18:	b096      	sub	sp, #88	; 0x58
+ 8000a1a:	af00      	add	r7, sp, #0
 #ifdef BL_DEBUG_MSG_EN
 	char str[80];
 
 	// Extract the argument list using VA apis
 	va_list args;
 	va_start(args,format);
- 8000cf0:	f107 0364 	add.w	r3, r7, #100	; 0x64
- 8000cf4:	607b      	str	r3, [r7, #4]
+ 8000a1c:	f107 0364 	add.w	r3, r7, #100	; 0x64
+ 8000a20:	607b      	str	r3, [r7, #4]
 	vsprintf(str,format,args);
- 8000cf6:	f107 0308 	add.w	r3, r7, #8
- 8000cfa:	687a      	ldr	r2, [r7, #4]
- 8000cfc:	6e39      	ldr	r1, [r7, #96]	; 0x60
- 8000cfe:	4618      	mov	r0, r3
- 8000d00:	f002 fe1c 	bl	800393c <vsiprintf>
+ 8000a22:	f107 0308 	add.w	r3, r7, #8
+ 8000a26:	687a      	ldr	r2, [r7, #4]
+ 8000a28:	6e39      	ldr	r1, [r7, #96]	; 0x60
+ 8000a2a:	4618      	mov	r0, r3
+ 8000a2c:	f002 ff86 	bl	800393c <vsiprintf>
 	HAL_UART_Transmit(&huart1, (uint8_t*)str, strlen(str), HAL_MAX_DELAY);
- 8000d04:	f107 0308 	add.w	r3, r7, #8
- 8000d08:	4618      	mov	r0, r3
- 8000d0a:	f7ff fa69 	bl	80001e0 <strlen>
- 8000d0e:	4603      	mov	r3, r0
- 8000d10:	b29a      	uxth	r2, r3
- 8000d12:	f107 0108 	add.w	r1, r7, #8
- 8000d16:	f04f 33ff 	mov.w	r3, #4294967295
- 8000d1a:	4805      	ldr	r0, [pc, #20]	; (8000d30 <printmsg+0x48>)
- 8000d1c:	f002 f9af 	bl	800307e <HAL_UART_Transmit>
+ 8000a30:	f107 0308 	add.w	r3, r7, #8
+ 8000a34:	4618      	mov	r0, r3
+ 8000a36:	f7ff fbd3 	bl	80001e0 <strlen>
+ 8000a3a:	4603      	mov	r3, r0
+ 8000a3c:	b29a      	uxth	r2, r3
+ 8000a3e:	f107 0108 	add.w	r1, r7, #8
+ 8000a42:	f04f 33ff 	mov.w	r3, #4294967295
+ 8000a46:	4805      	ldr	r0, [pc, #20]	; (8000a5c <printmsg+0x48>)
+ 8000a48:	f002 fb19 	bl	800307e <HAL_UART_Transmit>
 	va_end(args);
 #endif
 
 }
- 8000d20:	bf00      	nop
- 8000d22:	3758      	adds	r7, #88	; 0x58
- 8000d24:	46bd      	mov	sp, r7
- 8000d26:	e8bd 4080 	ldmia.w	sp!, {r7, lr}
- 8000d2a:	b004      	add	sp, #16
- 8000d2c:	4770      	bx	lr
- 8000d2e:	bf00      	nop
- 8000d30:	200000a0 	.word	0x200000a0
+ 8000a4c:	bf00      	nop
+ 8000a4e:	3758      	adds	r7, #88	; 0x58
+ 8000a50:	46bd      	mov	sp, r7
+ 8000a52:	e8bd 4080 	ldmia.w	sp!, {r7, lr}
+ 8000a56:	b004      	add	sp, #16
+ 8000a58:	4770      	bx	lr
+ 8000a5a:	bf00      	nop
+ 8000a5c:	20000168 	.word	0x20000168
 
-08000d34 <bootloader_uart_read_data>:
+08000a60 <bootloader_uart_read_data>:
 
 void bootloader_uart_read_data(void)
 {
- 8000d34:	b580      	push	{r7, lr}
- 8000d36:	b082      	sub	sp, #8
- 8000d38:	af00      	add	r7, sp, #0
+ 8000a60:	b580      	push	{r7, lr}
+ 8000a62:	b082      	sub	sp, #8
+ 8000a64:	af00      	add	r7, sp, #0
 	uint8_t rcv_len = 0;
- 8000d3a:	2300      	movs	r3, #0
- 8000d3c:	71fb      	strb	r3, [r7, #7]
+ 8000a66:	2300      	movs	r3, #0
+ 8000a68:	71fb      	strb	r3, [r7, #7]
 
 	while(1)
 	{
 		// Clean array
 		memset(bl_rx_buffer,0,200);
- 8000d3e:	22c8      	movs	r2, #200	; 0xc8
- 8000d40:	2100      	movs	r1, #0
- 8000d42:	4835      	ldr	r0, [pc, #212]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000d44:	f002 fddc 	bl	8003900 <memset>
+ 8000a6a:	22c8      	movs	r2, #200	; 0xc8
+ 8000a6c:	2100      	movs	r1, #0
+ 8000a6e:	4835      	ldr	r0, [pc, #212]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000a70:	f002 ff46 	bl	8003900 <memset>
 
 
 		//Here we'll read and decode the commands coming from host
 		//First read only one byte from the host, which is the "length" field of the command
 		HAL_UART_Receive(C_UART,bl_rx_buffer,1,HAL_MAX_DELAY);
- 8000d48:	f04f 33ff 	mov.w	r3, #4294967295
- 8000d4c:	2201      	movs	r2, #1
- 8000d4e:	4932      	ldr	r1, [pc, #200]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000d50:	4832      	ldr	r0, [pc, #200]	; (8000e1c <bootloader_uart_read_data+0xe8>)
- 8000d52:	f002 fa26 	bl	80031a2 <HAL_UART_Receive>
+ 8000a74:	f04f 33ff 	mov.w	r3, #4294967295
+ 8000a78:	2201      	movs	r2, #1
+ 8000a7a:	4932      	ldr	r1, [pc, #200]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000a7c:	4832      	ldr	r0, [pc, #200]	; (8000b48 <bootloader_uart_read_data+0xe8>)
+ 8000a7e:	f002 fb90 	bl	80031a2 <HAL_UART_Receive>
 		rcv_len=bl_rx_buffer[0];
- 8000d56:	4b30      	ldr	r3, [pc, #192]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000d58:	781b      	ldrb	r3, [r3, #0]
- 8000d5a:	71fb      	strb	r3, [r7, #7]
+ 8000a82:	4b30      	ldr	r3, [pc, #192]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000a84:	781b      	ldrb	r3, [r3, #0]
+ 8000a86:	71fb      	strb	r3, [r7, #7]
 
 		// Read the command and the rest of the message
 		HAL_UART_Receive(C_UART,&bl_rx_buffer[1],rcv_len,HAL_MAX_DELAY);
- 8000d5c:	79fb      	ldrb	r3, [r7, #7]
- 8000d5e:	b29a      	uxth	r2, r3
- 8000d60:	f04f 33ff 	mov.w	r3, #4294967295
- 8000d64:	492e      	ldr	r1, [pc, #184]	; (8000e20 <bootloader_uart_read_data+0xec>)
- 8000d66:	482d      	ldr	r0, [pc, #180]	; (8000e1c <bootloader_uart_read_data+0xe8>)
- 8000d68:	f002 fa1b 	bl	80031a2 <HAL_UART_Receive>
+ 8000a88:	79fb      	ldrb	r3, [r7, #7]
+ 8000a8a:	b29a      	uxth	r2, r3
+ 8000a8c:	f04f 33ff 	mov.w	r3, #4294967295
+ 8000a90:	492e      	ldr	r1, [pc, #184]	; (8000b4c <bootloader_uart_read_data+0xec>)
+ 8000a92:	482d      	ldr	r0, [pc, #180]	; (8000b48 <bootloader_uart_read_data+0xe8>)
+ 8000a94:	f002 fb85 	bl	80031a2 <HAL_UART_Receive>
 		//printmsg("BL_DEBUG_MSG: Command received: %#x\r\n",bl_rx_buffer[1]);
 		switch(bl_rx_buffer[1])
- 8000d6c:	4b2a      	ldr	r3, [pc, #168]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000d6e:	785b      	ldrb	r3, [r3, #1]
- 8000d70:	3b51      	subs	r3, #81	; 0x51
- 8000d72:	2b0b      	cmp	r3, #11
- 8000d74:	d84a      	bhi.n	8000e0c <bootloader_uart_read_data+0xd8>
- 8000d76:	a201      	add	r2, pc, #4	; (adr r2, 8000d7c <bootloader_uart_read_data+0x48>)
- 8000d78:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
- 8000d7c:	08000dad 	.word	0x08000dad
- 8000d80:	08000db5 	.word	0x08000db5
- 8000d84:	08000dbd 	.word	0x08000dbd
- 8000d88:	08000dc5 	.word	0x08000dc5
- 8000d8c:	08000dcd 	.word	0x08000dcd
- 8000d90:	08000dd5 	.word	0x08000dd5
- 8000d94:	08000ddd 	.word	0x08000ddd
- 8000d98:	08000de5 	.word	0x08000de5
- 8000d9c:	08000ded 	.word	0x08000ded
- 8000da0:	08000df5 	.word	0x08000df5
- 8000da4:	08000dfd 	.word	0x08000dfd
- 8000da8:	08000e05 	.word	0x08000e05
+ 8000a98:	4b2a      	ldr	r3, [pc, #168]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000a9a:	785b      	ldrb	r3, [r3, #1]
+ 8000a9c:	3b51      	subs	r3, #81	; 0x51
+ 8000a9e:	2b0b      	cmp	r3, #11
+ 8000aa0:	d84a      	bhi.n	8000b38 <bootloader_uart_read_data+0xd8>
+ 8000aa2:	a201      	add	r2, pc, #4	; (adr r2, 8000aa8 <bootloader_uart_read_data+0x48>)
+ 8000aa4:	f852 f023 	ldr.w	pc, [r2, r3, lsl #2]
+ 8000aa8:	08000ad9 	.word	0x08000ad9
+ 8000aac:	08000ae1 	.word	0x08000ae1
+ 8000ab0:	08000ae9 	.word	0x08000ae9
+ 8000ab4:	08000af1 	.word	0x08000af1
+ 8000ab8:	08000af9 	.word	0x08000af9
+ 8000abc:	08000b01 	.word	0x08000b01
+ 8000ac0:	08000b09 	.word	0x08000b09
+ 8000ac4:	08000b11 	.word	0x08000b11
+ 8000ac8:	08000b19 	.word	0x08000b19
+ 8000acc:	08000b21 	.word	0x08000b21
+ 8000ad0:	08000b29 	.word	0x08000b29
+ 8000ad4:	08000b31 	.word	0x08000b31
 		{
 			case BL_GET_VER:
 				bootloader_handle_getver_cmd(bl_rx_buffer);
- 8000dac:	481a      	ldr	r0, [pc, #104]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000dae:	f000 f83b 	bl	8000e28 <bootloader_handle_getver_cmd>
+ 8000ad8:	481a      	ldr	r0, [pc, #104]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000ada:	f000 f83b 	bl	8000b54 <bootloader_handle_getver_cmd>
 				break;
- 8000db2:	e02f      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000ade:	e02f      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_GET_HELP:
 				bootloader_handle_gethelp_cmd(bl_rx_buffer);
- 8000db4:	4818      	ldr	r0, [pc, #96]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000db6:	f000 f87f 	bl	8000eb8 <bootloader_handle_gethelp_cmd>
+ 8000ae0:	4818      	ldr	r0, [pc, #96]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000ae2:	f000 f87f 	bl	8000be4 <bootloader_handle_gethelp_cmd>
 				break;
- 8000dba:	e02b      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000ae6:	e02b      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_GET_CID:
 				bootloader_handle_getcid_cmd(bl_rx_buffer);
- 8000dbc:	4816      	ldr	r0, [pc, #88]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000dbe:	f000 f8b5 	bl	8000f2c <bootloader_handle_getcid_cmd>
+ 8000ae8:	4816      	ldr	r0, [pc, #88]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000aea:	f000 f8b5 	bl	8000c58 <bootloader_handle_getcid_cmd>
 				break;
- 8000dc2:	e027      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000aee:	e027      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_GET_RDP_STATUS:
 				bootloader_handle_getrdp_cmd(bl_rx_buffer);
- 8000dc4:	4814      	ldr	r0, [pc, #80]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000dc6:	f000 f8f9 	bl	8000fbc <bootloader_handle_getrdp_cmd>
+ 8000af0:	4814      	ldr	r0, [pc, #80]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000af2:	f000 f8f9 	bl	8000ce8 <bootloader_handle_getrdp_cmd>
 				break;
- 8000dca:	e023      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000af6:	e023      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_GO_TO_ADDR:
 				bootloader_handle_go_cmd(bl_rx_buffer);
- 8000dcc:	4812      	ldr	r0, [pc, #72]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000dce:	f000 f93d 	bl	800104c <bootloader_handle_go_cmd>
+ 8000af8:	4812      	ldr	r0, [pc, #72]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000afa:	f000 f93d 	bl	8000d78 <bootloader_handle_go_cmd>
 				break;
- 8000dd2:	e01f      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000afe:	e01f      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_FLASH_ERASE:
 				bootloader_handle_flash_erase_cmd(bl_rx_buffer);
- 8000dd4:	4810      	ldr	r0, [pc, #64]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000dd6:	f000 f9a3 	bl	8001120 <bootloader_handle_flash_erase_cmd>
+ 8000b00:	4810      	ldr	r0, [pc, #64]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000b02:	f000 f9a3 	bl	8000e4c <bootloader_handle_flash_erase_cmd>
 				break;
- 8000dda:	e01b      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000b06:	e01b      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_MEM_WRITE:
 				bootloader_handle_mem_write_cmd(bl_rx_buffer);
- 8000ddc:	480e      	ldr	r0, [pc, #56]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000dde:	f000 fa07 	bl	80011f0 <bootloader_handle_mem_write_cmd>
+ 8000b08:	480e      	ldr	r0, [pc, #56]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000b0a:	f000 fa07 	bl	8000f1c <bootloader_handle_mem_write_cmd>
 				break;
- 8000de2:	e017      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000b0e:	e017      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_EN_R_W_PROTECT:
 				bootloader_handle_endis_rw_protect_cmd(bl_rx_buffer);
- 8000de4:	480c      	ldr	r0, [pc, #48]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000de6:	f000 fa8d 	bl	8001304 <bootloader_handle_endis_rw_protect_cmd>
+ 8000b10:	480c      	ldr	r0, [pc, #48]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000b12:	f000 fa8d 	bl	8001030 <bootloader_handle_endis_rw_protect_cmd>
 				break;
- 8000dea:	e013      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000b16:	e013      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_MEM_READ:
 				bootloader_handle_mem_read_cmd(bl_rx_buffer);
- 8000dec:	480a      	ldr	r0, [pc, #40]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000dee:	f000 fad9 	bl	80013a4 <bootloader_handle_mem_read_cmd>
+ 8000b18:	480a      	ldr	r0, [pc, #40]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000b1a:	f000 fad9 	bl	80010d0 <bootloader_handle_mem_read_cmd>
 				break;
- 8000df2:	e00f      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000b1e:	e00f      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_READ_SECTOR_STATUS:
 				bootloader_handle_read_sector_status_cmd(bl_rx_buffer);
- 8000df4:	4808      	ldr	r0, [pc, #32]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000df6:	f000 fb55 	bl	80014a4 <bootloader_handle_read_sector_status_cmd>
+ 8000b20:	4808      	ldr	r0, [pc, #32]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000b22:	f000 fb55 	bl	80011d0 <bootloader_handle_read_sector_status_cmd>
 				break;
- 8000dfa:	e00b      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000b26:	e00b      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_OTP_READ:
 				bootloader_handle_otp_read_cmd(bl_rx_buffer);
- 8000dfc:	4806      	ldr	r0, [pc, #24]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000dfe:	f000 fb99 	bl	8001534 <bootloader_handle_otp_read_cmd>
+ 8000b28:	4806      	ldr	r0, [pc, #24]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000b2a:	f000 fb99 	bl	8001260 <bootloader_handle_otp_read_cmd>
 				break;
- 8000e02:	e007      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000b2e:	e007      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			case BL_DIS_R_W_PROTECT:
 				bootloader_handle_dis_r_w_protect_cmd(bl_rx_buffer);
- 8000e04:	4804      	ldr	r0, [pc, #16]	; (8000e18 <bootloader_uart_read_data+0xe4>)
- 8000e06:	f000 fb9f 	bl	8001548 <bootloader_handle_dis_r_w_protect_cmd>
+ 8000b30:	4804      	ldr	r0, [pc, #16]	; (8000b44 <bootloader_uart_read_data+0xe4>)
+ 8000b32:	f000 fb9f 	bl	8001274 <bootloader_handle_dis_r_w_protect_cmd>
 				break;
- 8000e0a:	e003      	b.n	8000e14 <bootloader_uart_read_data+0xe0>
+ 8000b36:	e003      	b.n	8000b40 <bootloader_uart_read_data+0xe0>
 			default:
 				printmsg("BL_DEBUG_MSG:Invalid command code received from host\r\n");
- 8000e0c:	4805      	ldr	r0, [pc, #20]	; (8000e24 <bootloader_uart_read_data+0xf0>)
- 8000e0e:	f7ff ff6b 	bl	8000ce8 <printmsg>
+ 8000b38:	4805      	ldr	r0, [pc, #20]	; (8000b50 <bootloader_uart_read_data+0xf0>)
+ 8000b3a:	f7ff ff6b 	bl	8000a14 <printmsg>
 				break;
- 8000e12:	bf00      	nop
+ 8000b3e:	bf00      	nop
 		memset(bl_rx_buffer,0,200);
- 8000e14:	e793      	b.n	8000d3e <bootloader_uart_read_data+0xa>
- 8000e16:	bf00      	nop
- 8000e18:	20000128 	.word	0x20000128
- 8000e1c:	200000e4 	.word	0x200000e4
- 8000e20:	20000129 	.word	0x20000129
- 8000e24:	080042ac 	.word	0x080042ac
+ 8000b40:	e793      	b.n	8000a6a <bootloader_uart_read_data+0xa>
+ 8000b42:	bf00      	nop
+ 8000b44:	20000098 	.word	0x20000098
+ 8000b48:	200001ac 	.word	0x200001ac
+ 8000b4c:	20000099 	.word	0x20000099
+ 8000b50:	08004238 	.word	0x08004238
 
-08000e28 <bootloader_handle_getver_cmd>:
+08000b54 <bootloader_handle_getver_cmd>:
 
 }
 
 
 void bootloader_handle_getver_cmd(uint8_t *bl_rx_buffer)
 {
- 8000e28:	b580      	push	{r7, lr}
- 8000e2a:	b086      	sub	sp, #24
- 8000e2c:	af00      	add	r7, sp, #0
- 8000e2e:	6078      	str	r0, [r7, #4]
+ 8000b54:	b580      	push	{r7, lr}
+ 8000b56:	b086      	sub	sp, #24
+ 8000b58:	af00      	add	r7, sp, #0
+ 8000b5a:	6078      	str	r0, [r7, #4]
 	uint8_t bl_version;
 
 	// 1) verify the checksum
 	printmsg("BL_DEBUG_MSG:bootloader_handle_getver_cmd\r\n");
- 8000e30:	481d      	ldr	r0, [pc, #116]	; (8000ea8 <bootloader_handle_getver_cmd+0x80>)
- 8000e32:	f7ff ff59 	bl	8000ce8 <printmsg>
+ 8000b5c:	481d      	ldr	r0, [pc, #116]	; (8000bd4 <bootloader_handle_getver_cmd+0x80>)
+ 8000b5e:	f7ff ff59 	bl	8000a14 <printmsg>
 
 	// Total lenght of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 8000e36:	687b      	ldr	r3, [r7, #4]
- 8000e38:	781b      	ldrb	r3, [r3, #0]
- 8000e3a:	3301      	adds	r3, #1
- 8000e3c:	617b      	str	r3, [r7, #20]
+ 8000b62:	687b      	ldr	r3, [r7, #4]
+ 8000b64:	781b      	ldrb	r3, [r3, #0]
+ 8000b66:	3301      	adds	r3, #1
+ 8000b68:	617b      	str	r3, [r7, #20]
 
 	// extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len - 4));
- 8000e3e:	697b      	ldr	r3, [r7, #20]
- 8000e40:	3b04      	subs	r3, #4
- 8000e42:	687a      	ldr	r2, [r7, #4]
- 8000e44:	4413      	add	r3, r2
- 8000e46:	681b      	ldr	r3, [r3, #0]
- 8000e48:	613b      	str	r3, [r7, #16]
+ 8000b6a:	697b      	ldr	r3, [r7, #20]
+ 8000b6c:	3b04      	subs	r3, #4
+ 8000b6e:	687a      	ldr	r2, [r7, #4]
+ 8000b70:	4413      	add	r3, r2
+ 8000b72:	681b      	ldr	r3, [r3, #0]
+ 8000b74:	613b      	str	r3, [r7, #16]
 
 	if(!bootloader_verify_crc(&bl_rx_buffer[0],command_packet_len-4,host_crc))
- 8000e4a:	697b      	ldr	r3, [r7, #20]
- 8000e4c:	3b04      	subs	r3, #4
- 8000e4e:	693a      	ldr	r2, [r7, #16]
- 8000e50:	4619      	mov	r1, r3
- 8000e52:	6878      	ldr	r0, [r7, #4]
- 8000e54:	f7ff fd34 	bl	80008c0 <bootloader_verify_crc>
- 8000e58:	4603      	mov	r3, r0
- 8000e5a:	2b00      	cmp	r3, #0
- 8000e5c:	d11a      	bne.n	8000e94 <bootloader_handle_getver_cmd+0x6c>
+ 8000b76:	697b      	ldr	r3, [r7, #20]
+ 8000b78:	3b04      	subs	r3, #4
+ 8000b7a:	693a      	ldr	r2, [r7, #16]
+ 8000b7c:	4619      	mov	r1, r3
+ 8000b7e:	6878      	ldr	r0, [r7, #4]
+ 8000b80:	f7ff fd34 	bl	80005ec <bootloader_verify_crc>
+ 8000b84:	4603      	mov	r3, r0
+ 8000b86:	2b00      	cmp	r3, #0
+ 8000b88:	d11a      	bne.n	8000bc0 <bootloader_handle_getver_cmd+0x6c>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 8000e5e:	4813      	ldr	r0, [pc, #76]	; (8000eac <bootloader_handle_getver_cmd+0x84>)
- 8000e60:	f7ff ff42 	bl	8000ce8 <printmsg>
+ 8000b8a:	4813      	ldr	r0, [pc, #76]	; (8000bd8 <bootloader_handle_getver_cmd+0x84>)
+ 8000b8c:	f7ff ff42 	bl	8000a14 <printmsg>
 		// checksum is correct...
 		bootloader_send_ack(bl_rx_buffer[0],1);
- 8000e64:	687b      	ldr	r3, [r7, #4]
- 8000e66:	781b      	ldrb	r3, [r3, #0]
- 8000e68:	2101      	movs	r1, #1
- 8000e6a:	4618      	mov	r0, r3
- 8000e6c:	f7ff fcfc 	bl	8000868 <bootloader_send_ack>
+ 8000b90:	687b      	ldr	r3, [r7, #4]
+ 8000b92:	781b      	ldrb	r3, [r3, #0]
+ 8000b94:	2101      	movs	r1, #1
+ 8000b96:	4618      	mov	r0, r3
+ 8000b98:	f7ff fcfc 	bl	8000594 <bootloader_send_ack>
 		bl_version=get_bootloader_version();
- 8000e70:	f7ff fd62 	bl	8000938 <get_bootloader_version>
- 8000e74:	4603      	mov	r3, r0
- 8000e76:	73fb      	strb	r3, [r7, #15]
+ 8000b9c:	f7ff fd62 	bl	8000664 <get_bootloader_version>
+ 8000ba0:	4603      	mov	r3, r0
+ 8000ba2:	73fb      	strb	r3, [r7, #15]
 		printmsg("BL_DEBUG_MSG:BL_VER : %d %#x\r\n",bl_version,bl_version);
- 8000e78:	7bfb      	ldrb	r3, [r7, #15]
- 8000e7a:	4619      	mov	r1, r3
- 8000e7c:	7bfb      	ldrb	r3, [r7, #15]
- 8000e7e:	461a      	mov	r2, r3
- 8000e80:	480b      	ldr	r0, [pc, #44]	; (8000eb0 <bootloader_handle_getver_cmd+0x88>)
- 8000e82:	f7ff ff31 	bl	8000ce8 <printmsg>
+ 8000ba4:	7bfb      	ldrb	r3, [r7, #15]
+ 8000ba6:	4619      	mov	r1, r3
+ 8000ba8:	7bfb      	ldrb	r3, [r7, #15]
+ 8000baa:	461a      	mov	r2, r3
+ 8000bac:	480b      	ldr	r0, [pc, #44]	; (8000bdc <bootloader_handle_getver_cmd+0x88>)
+ 8000bae:	f7ff ff31 	bl	8000a14 <printmsg>
 		bootloader_uart_write_data(&bl_version,1);
- 8000e86:	f107 030f 	add.w	r3, r7, #15
- 8000e8a:	2101      	movs	r1, #1
- 8000e8c:	4618      	mov	r0, r3
- 8000e8e:	f7ff ff17 	bl	8000cc0 <bootloader_uart_write_data>
+ 8000bb2:	f107 030f 	add.w	r3, r7, #15
+ 8000bb6:	2101      	movs	r1, #1
+ 8000bb8:	4618      	mov	r0, r3
+ 8000bba:	f7ff ff17 	bl	80009ec <bootloader_uart_write_data>
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\r\n");
 		// checksum is wrong send NACK
 		bootloader_send_nack();
 	}
 }
- 8000e92:	e004      	b.n	8000e9e <bootloader_handle_getver_cmd+0x76>
+ 8000bbe:	e004      	b.n	8000bca <bootloader_handle_getver_cmd+0x76>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\r\n");
- 8000e94:	4807      	ldr	r0, [pc, #28]	; (8000eb4 <bootloader_handle_getver_cmd+0x8c>)
- 8000e96:	f7ff ff27 	bl	8000ce8 <printmsg>
+ 8000bc0:	4807      	ldr	r0, [pc, #28]	; (8000be0 <bootloader_handle_getver_cmd+0x8c>)
+ 8000bc2:	f7ff ff27 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 8000e9a:	f7ff fcff 	bl	800089c <bootloader_send_nack>
+ 8000bc6:	f7ff fcff 	bl	80005c8 <bootloader_send_nack>
 }
- 8000e9e:	bf00      	nop
- 8000ea0:	3718      	adds	r7, #24
- 8000ea2:	46bd      	mov	sp, r7
- 8000ea4:	bd80      	pop	{r7, pc}
- 8000ea6:	bf00      	nop
- 8000ea8:	080042e4 	.word	0x080042e4
- 8000eac:	08004310 	.word	0x08004310
- 8000eb0:	08004334 	.word	0x08004334
- 8000eb4:	08004354 	.word	0x08004354
+ 8000bca:	bf00      	nop
+ 8000bcc:	3718      	adds	r7, #24
+ 8000bce:	46bd      	mov	sp, r7
+ 8000bd0:	bd80      	pop	{r7, pc}
+ 8000bd2:	bf00      	nop
+ 8000bd4:	08004270 	.word	0x08004270
+ 8000bd8:	0800429c 	.word	0x0800429c
+ 8000bdc:	080042c0 	.word	0x080042c0
+ 8000be0:	080042e0 	.word	0x080042e0
 
-08000eb8 <bootloader_handle_gethelp_cmd>:
+08000be4 <bootloader_handle_gethelp_cmd>:
 
 void bootloader_handle_gethelp_cmd(uint8_t *bl_rx_buffer)
 {
- 8000eb8:	b580      	push	{r7, lr}
- 8000eba:	b084      	sub	sp, #16
- 8000ebc:	af00      	add	r7, sp, #0
- 8000ebe:	6078      	str	r0, [r7, #4]
+ 8000be4:	b580      	push	{r7, lr}
+ 8000be6:	b084      	sub	sp, #16
+ 8000be8:	af00      	add	r7, sp, #0
+ 8000bea:	6078      	str	r0, [r7, #4]
 	printmsg("BL_DEBUG_MSG::bootloader_handle_gethelp_cmd\r\n");
- 8000ec0:	4816      	ldr	r0, [pc, #88]	; (8000f1c <bootloader_handle_gethelp_cmd+0x64>)
- 8000ec2:	f7ff ff11 	bl	8000ce8 <printmsg>
+ 8000bec:	4816      	ldr	r0, [pc, #88]	; (8000c48 <bootloader_handle_gethelp_cmd+0x64>)
+ 8000bee:	f7ff ff11 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 8000ec6:	687b      	ldr	r3, [r7, #4]
- 8000ec8:	781b      	ldrb	r3, [r3, #0]
- 8000eca:	3301      	adds	r3, #1
- 8000ecc:	60fb      	str	r3, [r7, #12]
+ 8000bf2:	687b      	ldr	r3, [r7, #4]
+ 8000bf4:	781b      	ldrb	r3, [r3, #0]
+ 8000bf6:	3301      	adds	r3, #1
+ 8000bf8:	60fb      	str	r3, [r7, #12]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 8000ece:	68fb      	ldr	r3, [r7, #12]
- 8000ed0:	3b04      	subs	r3, #4
- 8000ed2:	687a      	ldr	r2, [r7, #4]
- 8000ed4:	4413      	add	r3, r2
- 8000ed6:	681b      	ldr	r3, [r3, #0]
- 8000ed8:	60bb      	str	r3, [r7, #8]
+ 8000bfa:	68fb      	ldr	r3, [r7, #12]
+ 8000bfc:	3b04      	subs	r3, #4
+ 8000bfe:	687a      	ldr	r2, [r7, #4]
+ 8000c00:	4413      	add	r3, r2
+ 8000c02:	681b      	ldr	r3, [r3, #0]
+ 8000c04:	60bb      	str	r3, [r7, #8]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 8000eda:	68fb      	ldr	r3, [r7, #12]
- 8000edc:	3b04      	subs	r3, #4
- 8000ede:	68ba      	ldr	r2, [r7, #8]
- 8000ee0:	4619      	mov	r1, r3
- 8000ee2:	6878      	ldr	r0, [r7, #4]
- 8000ee4:	f7ff fcec 	bl	80008c0 <bootloader_verify_crc>
- 8000ee8:	4603      	mov	r3, r0
- 8000eea:	2b00      	cmp	r3, #0
- 8000eec:	d10d      	bne.n	8000f0a <bootloader_handle_gethelp_cmd+0x52>
+ 8000c06:	68fb      	ldr	r3, [r7, #12]
+ 8000c08:	3b04      	subs	r3, #4
+ 8000c0a:	68ba      	ldr	r2, [r7, #8]
+ 8000c0c:	4619      	mov	r1, r3
+ 8000c0e:	6878      	ldr	r0, [r7, #4]
+ 8000c10:	f7ff fcec 	bl	80005ec <bootloader_verify_crc>
+ 8000c14:	4603      	mov	r3, r0
+ 8000c16:	2b00      	cmp	r3, #0
+ 8000c18:	d10d      	bne.n	8000c36 <bootloader_handle_gethelp_cmd+0x52>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 8000eee:	480c      	ldr	r0, [pc, #48]	; (8000f20 <bootloader_handle_gethelp_cmd+0x68>)
- 8000ef0:	f7ff fefa 	bl	8000ce8 <printmsg>
+ 8000c1a:	480c      	ldr	r0, [pc, #48]	; (8000c4c <bootloader_handle_gethelp_cmd+0x68>)
+ 8000c1c:	f7ff fefa 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],sizeof(supported_cmds));
- 8000ef4:	687b      	ldr	r3, [r7, #4]
- 8000ef6:	781b      	ldrb	r3, [r3, #0]
- 8000ef8:	210c      	movs	r1, #12
- 8000efa:	4618      	mov	r0, r3
- 8000efc:	f7ff fcb4 	bl	8000868 <bootloader_send_ack>
+ 8000c20:	687b      	ldr	r3, [r7, #4]
+ 8000c22:	781b      	ldrb	r3, [r3, #0]
+ 8000c24:	210c      	movs	r1, #12
+ 8000c26:	4618      	mov	r0, r3
+ 8000c28:	f7ff fcb4 	bl	8000594 <bootloader_send_ack>
 		bootloader_uart_write_data(supported_cmds, sizeof(supported_cmds));
- 8000f00:	210c      	movs	r1, #12
- 8000f02:	4808      	ldr	r0, [pc, #32]	; (8000f24 <bootloader_handle_gethelp_cmd+0x6c>)
- 8000f04:	f7ff fedc 	bl	8000cc0 <bootloader_uart_write_data>
+ 8000c2c:	210c      	movs	r1, #12
+ 8000c2e:	4808      	ldr	r0, [pc, #32]	; (8000c50 <bootloader_handle_gethelp_cmd+0x6c>)
+ 8000c30:	f7ff fedc 	bl	80009ec <bootloader_uart_write_data>
 	else
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 }
- 8000f08:	e004      	b.n	8000f14 <bootloader_handle_gethelp_cmd+0x5c>
+ 8000c34:	e004      	b.n	8000c40 <bootloader_handle_gethelp_cmd+0x5c>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 8000f0a:	4807      	ldr	r0, [pc, #28]	; (8000f28 <bootloader_handle_gethelp_cmd+0x70>)
- 8000f0c:	f7ff feec 	bl	8000ce8 <printmsg>
+ 8000c36:	4807      	ldr	r0, [pc, #28]	; (8000c54 <bootloader_handle_gethelp_cmd+0x70>)
+ 8000c38:	f7ff feec 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 8000f10:	f7ff fcc4 	bl	800089c <bootloader_send_nack>
+ 8000c3c:	f7ff fcc4 	bl	80005c8 <bootloader_send_nack>
 }
- 8000f14:	bf00      	nop
- 8000f16:	3710      	adds	r7, #16
- 8000f18:	46bd      	mov	sp, r7
- 8000f1a:	bd80      	pop	{r7, pc}
- 8000f1c:	08004374 	.word	0x08004374
- 8000f20:	08004310 	.word	0x08004310
- 8000f24:	20000000 	.word	0x20000000
- 8000f28:	080043a4 	.word	0x080043a4
+ 8000c40:	bf00      	nop
+ 8000c42:	3710      	adds	r7, #16
+ 8000c44:	46bd      	mov	sp, r7
+ 8000c46:	bd80      	pop	{r7, pc}
+ 8000c48:	08004300 	.word	0x08004300
+ 8000c4c:	0800429c 	.word	0x0800429c
+ 8000c50:	20000000 	.word	0x20000000
+ 8000c54:	08004330 	.word	0x08004330
 
-08000f2c <bootloader_handle_getcid_cmd>:
+08000c58 <bootloader_handle_getcid_cmd>:
 
 void bootloader_handle_getcid_cmd(uint8_t *bl_rx_buffer)
 {
- 8000f2c:	b580      	push	{r7, lr}
- 8000f2e:	b086      	sub	sp, #24
- 8000f30:	af00      	add	r7, sp, #0
- 8000f32:	6078      	str	r0, [r7, #4]
+ 8000c58:	b580      	push	{r7, lr}
+ 8000c5a:	b086      	sub	sp, #24
+ 8000c5c:	af00      	add	r7, sp, #0
+ 8000c5e:	6078      	str	r0, [r7, #4]
 	printmsg("BL_DEBUG_MSG::bootloader_handle_getcid_cmd\r\n");
- 8000f34:	481d      	ldr	r0, [pc, #116]	; (8000fac <bootloader_handle_getcid_cmd+0x80>)
- 8000f36:	f7ff fed7 	bl	8000ce8 <printmsg>
+ 8000c60:	481d      	ldr	r0, [pc, #116]	; (8000cd8 <bootloader_handle_getcid_cmd+0x80>)
+ 8000c62:	f7ff fed7 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 8000f3a:	687b      	ldr	r3, [r7, #4]
- 8000f3c:	781b      	ldrb	r3, [r3, #0]
- 8000f3e:	3301      	adds	r3, #1
- 8000f40:	617b      	str	r3, [r7, #20]
+ 8000c66:	687b      	ldr	r3, [r7, #4]
+ 8000c68:	781b      	ldrb	r3, [r3, #0]
+ 8000c6a:	3301      	adds	r3, #1
+ 8000c6c:	617b      	str	r3, [r7, #20]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 8000f42:	697b      	ldr	r3, [r7, #20]
- 8000f44:	3b04      	subs	r3, #4
- 8000f46:	687a      	ldr	r2, [r7, #4]
- 8000f48:	4413      	add	r3, r2
- 8000f4a:	681b      	ldr	r3, [r3, #0]
- 8000f4c:	613b      	str	r3, [r7, #16]
+ 8000c6e:	697b      	ldr	r3, [r7, #20]
+ 8000c70:	3b04      	subs	r3, #4
+ 8000c72:	687a      	ldr	r2, [r7, #4]
+ 8000c74:	4413      	add	r3, r2
+ 8000c76:	681b      	ldr	r3, [r3, #0]
+ 8000c78:	613b      	str	r3, [r7, #16]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 8000f4e:	697b      	ldr	r3, [r7, #20]
- 8000f50:	3b04      	subs	r3, #4
- 8000f52:	693a      	ldr	r2, [r7, #16]
- 8000f54:	4619      	mov	r1, r3
- 8000f56:	6878      	ldr	r0, [r7, #4]
- 8000f58:	f7ff fcb2 	bl	80008c0 <bootloader_verify_crc>
- 8000f5c:	4603      	mov	r3, r0
- 8000f5e:	2b00      	cmp	r3, #0
- 8000f60:	d11a      	bne.n	8000f98 <bootloader_handle_getcid_cmd+0x6c>
+ 8000c7a:	697b      	ldr	r3, [r7, #20]
+ 8000c7c:	3b04      	subs	r3, #4
+ 8000c7e:	693a      	ldr	r2, [r7, #16]
+ 8000c80:	4619      	mov	r1, r3
+ 8000c82:	6878      	ldr	r0, [r7, #4]
+ 8000c84:	f7ff fcb2 	bl	80005ec <bootloader_verify_crc>
+ 8000c88:	4603      	mov	r3, r0
+ 8000c8a:	2b00      	cmp	r3, #0
+ 8000c8c:	d11a      	bne.n	8000cc4 <bootloader_handle_getcid_cmd+0x6c>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 8000f62:	4813      	ldr	r0, [pc, #76]	; (8000fb0 <bootloader_handle_getcid_cmd+0x84>)
- 8000f64:	f7ff fec0 	bl	8000ce8 <printmsg>
+ 8000c8e:	4813      	ldr	r0, [pc, #76]	; (8000cdc <bootloader_handle_getcid_cmd+0x84>)
+ 8000c90:	f7ff fec0 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],2);
- 8000f68:	687b      	ldr	r3, [r7, #4]
- 8000f6a:	781b      	ldrb	r3, [r3, #0]
- 8000f6c:	2102      	movs	r1, #2
- 8000f6e:	4618      	mov	r0, r3
- 8000f70:	f7ff fc7a 	bl	8000868 <bootloader_send_ack>
+ 8000c94:	687b      	ldr	r3, [r7, #4]
+ 8000c96:	781b      	ldrb	r3, [r3, #0]
+ 8000c98:	2102      	movs	r1, #2
+ 8000c9a:	4618      	mov	r0, r3
+ 8000c9c:	f7ff fc7a 	bl	8000594 <bootloader_send_ack>
 		uint16_t bl_cid_num = get_mcu_chip_id();
- 8000f74:	f7ff fce8 	bl	8000948 <get_mcu_chip_id>
- 8000f78:	4603      	mov	r3, r0
- 8000f7a:	81fb      	strh	r3, [r7, #14]
+ 8000ca0:	f7ff fce8 	bl	8000674 <get_mcu_chip_id>
+ 8000ca4:	4603      	mov	r3, r0
+ 8000ca6:	81fb      	strh	r3, [r7, #14]
 		printmsg("BL_DEBUG_MSG:MCU id: %d %#x\r\n",bl_cid_num,bl_cid_num);
- 8000f7c:	89fb      	ldrh	r3, [r7, #14]
- 8000f7e:	4619      	mov	r1, r3
- 8000f80:	89fb      	ldrh	r3, [r7, #14]
- 8000f82:	461a      	mov	r2, r3
- 8000f84:	480b      	ldr	r0, [pc, #44]	; (8000fb4 <bootloader_handle_getcid_cmd+0x88>)
- 8000f86:	f7ff feaf 	bl	8000ce8 <printmsg>
+ 8000ca8:	89fb      	ldrh	r3, [r7, #14]
+ 8000caa:	4619      	mov	r1, r3
+ 8000cac:	89fb      	ldrh	r3, [r7, #14]
+ 8000cae:	461a      	mov	r2, r3
+ 8000cb0:	480b      	ldr	r0, [pc, #44]	; (8000ce0 <bootloader_handle_getcid_cmd+0x88>)
+ 8000cb2:	f7ff feaf 	bl	8000a14 <printmsg>
 		bootloader_uart_write_data(((uint8_t*)&bl_cid_num), 2);
- 8000f8a:	f107 030e 	add.w	r3, r7, #14
- 8000f8e:	2102      	movs	r1, #2
- 8000f90:	4618      	mov	r0, r3
- 8000f92:	f7ff fe95 	bl	8000cc0 <bootloader_uart_write_data>
+ 8000cb6:	f107 030e 	add.w	r3, r7, #14
+ 8000cba:	2102      	movs	r1, #2
+ 8000cbc:	4618      	mov	r0, r3
+ 8000cbe:	f7ff fe95 	bl	80009ec <bootloader_uart_write_data>
 	else
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 }
- 8000f96:	e004      	b.n	8000fa2 <bootloader_handle_getcid_cmd+0x76>
+ 8000cc2:	e004      	b.n	8000cce <bootloader_handle_getcid_cmd+0x76>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 8000f98:	4807      	ldr	r0, [pc, #28]	; (8000fb8 <bootloader_handle_getcid_cmd+0x8c>)
- 8000f9a:	f7ff fea5 	bl	8000ce8 <printmsg>
+ 8000cc4:	4807      	ldr	r0, [pc, #28]	; (8000ce4 <bootloader_handle_getcid_cmd+0x8c>)
+ 8000cc6:	f7ff fea5 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 8000f9e:	f7ff fc7d 	bl	800089c <bootloader_send_nack>
+ 8000cca:	f7ff fc7d 	bl	80005c8 <bootloader_send_nack>
 }
- 8000fa2:	bf00      	nop
- 8000fa4:	3718      	adds	r7, #24
- 8000fa6:	46bd      	mov	sp, r7
- 8000fa8:	bd80      	pop	{r7, pc}
- 8000faa:	bf00      	nop
- 8000fac:	080043c4 	.word	0x080043c4
- 8000fb0:	08004310 	.word	0x08004310
- 8000fb4:	080043f4 	.word	0x080043f4
- 8000fb8:	080043a4 	.word	0x080043a4
+ 8000cce:	bf00      	nop
+ 8000cd0:	3718      	adds	r7, #24
+ 8000cd2:	46bd      	mov	sp, r7
+ 8000cd4:	bd80      	pop	{r7, pc}
+ 8000cd6:	bf00      	nop
+ 8000cd8:	08004350 	.word	0x08004350
+ 8000cdc:	0800429c 	.word	0x0800429c
+ 8000ce0:	08004380 	.word	0x08004380
+ 8000ce4:	08004330 	.word	0x08004330
 
-08000fbc <bootloader_handle_getrdp_cmd>:
+08000ce8 <bootloader_handle_getrdp_cmd>:
 
 void bootloader_handle_getrdp_cmd(uint8_t *bl_rx_buffer)
 {
- 8000fbc:	b580      	push	{r7, lr}
- 8000fbe:	b086      	sub	sp, #24
- 8000fc0:	af00      	add	r7, sp, #0
- 8000fc2:	6078      	str	r0, [r7, #4]
+ 8000ce8:	b580      	push	{r7, lr}
+ 8000cea:	b086      	sub	sp, #24
+ 8000cec:	af00      	add	r7, sp, #0
+ 8000cee:	6078      	str	r0, [r7, #4]
 	printmsg("BL_DEBUG_MSG::bootloader_handle_getrdp_cmd\r\n");
- 8000fc4:	481d      	ldr	r0, [pc, #116]	; (800103c <bootloader_handle_getrdp_cmd+0x80>)
- 8000fc6:	f7ff fe8f 	bl	8000ce8 <printmsg>
+ 8000cf0:	481d      	ldr	r0, [pc, #116]	; (8000d68 <bootloader_handle_getrdp_cmd+0x80>)
+ 8000cf2:	f7ff fe8f 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 8000fca:	687b      	ldr	r3, [r7, #4]
- 8000fcc:	781b      	ldrb	r3, [r3, #0]
- 8000fce:	3301      	adds	r3, #1
- 8000fd0:	617b      	str	r3, [r7, #20]
+ 8000cf6:	687b      	ldr	r3, [r7, #4]
+ 8000cf8:	781b      	ldrb	r3, [r3, #0]
+ 8000cfa:	3301      	adds	r3, #1
+ 8000cfc:	617b      	str	r3, [r7, #20]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 8000fd2:	697b      	ldr	r3, [r7, #20]
- 8000fd4:	3b04      	subs	r3, #4
- 8000fd6:	687a      	ldr	r2, [r7, #4]
- 8000fd8:	4413      	add	r3, r2
- 8000fda:	681b      	ldr	r3, [r3, #0]
- 8000fdc:	613b      	str	r3, [r7, #16]
+ 8000cfe:	697b      	ldr	r3, [r7, #20]
+ 8000d00:	3b04      	subs	r3, #4
+ 8000d02:	687a      	ldr	r2, [r7, #4]
+ 8000d04:	4413      	add	r3, r2
+ 8000d06:	681b      	ldr	r3, [r3, #0]
+ 8000d08:	613b      	str	r3, [r7, #16]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 8000fde:	697b      	ldr	r3, [r7, #20]
- 8000fe0:	3b04      	subs	r3, #4
- 8000fe2:	693a      	ldr	r2, [r7, #16]
- 8000fe4:	4619      	mov	r1, r3
- 8000fe6:	6878      	ldr	r0, [r7, #4]
- 8000fe8:	f7ff fc6a 	bl	80008c0 <bootloader_verify_crc>
- 8000fec:	4603      	mov	r3, r0
- 8000fee:	2b00      	cmp	r3, #0
- 8000ff0:	d11a      	bne.n	8001028 <bootloader_handle_getrdp_cmd+0x6c>
+ 8000d0a:	697b      	ldr	r3, [r7, #20]
+ 8000d0c:	3b04      	subs	r3, #4
+ 8000d0e:	693a      	ldr	r2, [r7, #16]
+ 8000d10:	4619      	mov	r1, r3
+ 8000d12:	6878      	ldr	r0, [r7, #4]
+ 8000d14:	f7ff fc6a 	bl	80005ec <bootloader_verify_crc>
+ 8000d18:	4603      	mov	r3, r0
+ 8000d1a:	2b00      	cmp	r3, #0
+ 8000d1c:	d11a      	bne.n	8000d54 <bootloader_handle_getrdp_cmd+0x6c>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 8000ff2:	4813      	ldr	r0, [pc, #76]	; (8001040 <bootloader_handle_getrdp_cmd+0x84>)
- 8000ff4:	f7ff fe78 	bl	8000ce8 <printmsg>
+ 8000d1e:	4813      	ldr	r0, [pc, #76]	; (8000d6c <bootloader_handle_getrdp_cmd+0x84>)
+ 8000d20:	f7ff fe78 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],2);
- 8000ff8:	687b      	ldr	r3, [r7, #4]
- 8000ffa:	781b      	ldrb	r3, [r3, #0]
- 8000ffc:	2102      	movs	r1, #2
- 8000ffe:	4618      	mov	r0, r3
- 8001000:	f7ff fc32 	bl	8000868 <bootloader_send_ack>
+ 8000d24:	687b      	ldr	r3, [r7, #4]
+ 8000d26:	781b      	ldrb	r3, [r3, #0]
+ 8000d28:	2102      	movs	r1, #2
+ 8000d2a:	4618      	mov	r0, r3
+ 8000d2c:	f7ff fc32 	bl	8000594 <bootloader_send_ack>
 		uint8_t rdp_level = get_flash_rdp_level();
- 8001004:	f7ff fcb2 	bl	800096c <get_flash_rdp_level>
- 8001008:	4603      	mov	r3, r0
- 800100a:	73fb      	strb	r3, [r7, #15]
+ 8000d30:	f7ff fcb2 	bl	8000698 <get_flash_rdp_level>
+ 8000d34:	4603      	mov	r3, r0
+ 8000d36:	73fb      	strb	r3, [r7, #15]
 		printmsg("BL_DEBUG_MSG:RDP level: %d %#x\r\n",rdp_level,rdp_level);
- 800100c:	7bfb      	ldrb	r3, [r7, #15]
- 800100e:	4619      	mov	r1, r3
- 8001010:	7bfb      	ldrb	r3, [r7, #15]
- 8001012:	461a      	mov	r2, r3
- 8001014:	480b      	ldr	r0, [pc, #44]	; (8001044 <bootloader_handle_getrdp_cmd+0x88>)
- 8001016:	f7ff fe67 	bl	8000ce8 <printmsg>
+ 8000d38:	7bfb      	ldrb	r3, [r7, #15]
+ 8000d3a:	4619      	mov	r1, r3
+ 8000d3c:	7bfb      	ldrb	r3, [r7, #15]
+ 8000d3e:	461a      	mov	r2, r3
+ 8000d40:	480b      	ldr	r0, [pc, #44]	; (8000d70 <bootloader_handle_getrdp_cmd+0x88>)
+ 8000d42:	f7ff fe67 	bl	8000a14 <printmsg>
 		bootloader_uart_write_data(((uint8_t*)&rdp_level), 1);
- 800101a:	f107 030f 	add.w	r3, r7, #15
- 800101e:	2101      	movs	r1, #1
- 8001020:	4618      	mov	r0, r3
- 8001022:	f7ff fe4d 	bl	8000cc0 <bootloader_uart_write_data>
+ 8000d46:	f107 030f 	add.w	r3, r7, #15
+ 8000d4a:	2101      	movs	r1, #1
+ 8000d4c:	4618      	mov	r0, r3
+ 8000d4e:	f7ff fe4d 	bl	80009ec <bootloader_uart_write_data>
 	else
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 }
- 8001026:	e004      	b.n	8001032 <bootloader_handle_getrdp_cmd+0x76>
+ 8000d52:	e004      	b.n	8000d5e <bootloader_handle_getrdp_cmd+0x76>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 8001028:	4807      	ldr	r0, [pc, #28]	; (8001048 <bootloader_handle_getrdp_cmd+0x8c>)
- 800102a:	f7ff fe5d 	bl	8000ce8 <printmsg>
+ 8000d54:	4807      	ldr	r0, [pc, #28]	; (8000d74 <bootloader_handle_getrdp_cmd+0x8c>)
+ 8000d56:	f7ff fe5d 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 800102e:	f7ff fc35 	bl	800089c <bootloader_send_nack>
+ 8000d5a:	f7ff fc35 	bl	80005c8 <bootloader_send_nack>
 }
- 8001032:	bf00      	nop
- 8001034:	3718      	adds	r7, #24
- 8001036:	46bd      	mov	sp, r7
- 8001038:	bd80      	pop	{r7, pc}
- 800103a:	bf00      	nop
- 800103c:	08004414 	.word	0x08004414
- 8001040:	08004310 	.word	0x08004310
- 8001044:	08004444 	.word	0x08004444
- 8001048:	080043a4 	.word	0x080043a4
+ 8000d5e:	bf00      	nop
+ 8000d60:	3718      	adds	r7, #24
+ 8000d62:	46bd      	mov	sp, r7
+ 8000d64:	bd80      	pop	{r7, pc}
+ 8000d66:	bf00      	nop
+ 8000d68:	080043a0 	.word	0x080043a0
+ 8000d6c:	0800429c 	.word	0x0800429c
+ 8000d70:	080043d0 	.word	0x080043d0
+ 8000d74:	08004330 	.word	0x08004330
 
-0800104c <bootloader_handle_go_cmd>:
+08000d78 <bootloader_handle_go_cmd>:
 
 void bootloader_handle_go_cmd(uint8_t *bl_rx_buffer)
 {
- 800104c:	b580      	push	{r7, lr}
- 800104e:	b088      	sub	sp, #32
- 8001050:	af00      	add	r7, sp, #0
- 8001052:	6078      	str	r0, [r7, #4]
+ 8000d78:	b580      	push	{r7, lr}
+ 8000d7a:	b088      	sub	sp, #32
+ 8000d7c:	af00      	add	r7, sp, #0
+ 8000d7e:	6078      	str	r0, [r7, #4]
 
 	uint32_t go_address = 0;
- 8001054:	2300      	movs	r3, #0
- 8001056:	61fb      	str	r3, [r7, #28]
+ 8000d80:	2300      	movs	r3, #0
+ 8000d82:	61fb      	str	r3, [r7, #28]
 	uint8_t addr_valid = ADDR_VALID;
- 8001058:	2300      	movs	r3, #0
- 800105a:	73fb      	strb	r3, [r7, #15]
+ 8000d84:	2300      	movs	r3, #0
+ 8000d86:	73fb      	strb	r3, [r7, #15]
 	uint8_t addr_invalid = ADDR_INVALID;
- 800105c:	2301      	movs	r3, #1
- 800105e:	73bb      	strb	r3, [r7, #14]
+ 8000d88:	2301      	movs	r3, #1
+ 8000d8a:	73bb      	strb	r3, [r7, #14]
 
 	printmsg("BL_DEBUG_MSG::bootloader_handle_go_cmd\r\n");
- 8001060:	4829      	ldr	r0, [pc, #164]	; (8001108 <bootloader_handle_go_cmd+0xbc>)
- 8001062:	f7ff fe41 	bl	8000ce8 <printmsg>
+ 8000d8c:	4829      	ldr	r0, [pc, #164]	; (8000e34 <bootloader_handle_go_cmd+0xbc>)
+ 8000d8e:	f7ff fe41 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 8001066:	687b      	ldr	r3, [r7, #4]
- 8001068:	781b      	ldrb	r3, [r3, #0]
- 800106a:	3301      	adds	r3, #1
- 800106c:	61bb      	str	r3, [r7, #24]
+ 8000d92:	687b      	ldr	r3, [r7, #4]
+ 8000d94:	781b      	ldrb	r3, [r3, #0]
+ 8000d96:	3301      	adds	r3, #1
+ 8000d98:	61bb      	str	r3, [r7, #24]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 800106e:	69bb      	ldr	r3, [r7, #24]
- 8001070:	3b04      	subs	r3, #4
- 8001072:	687a      	ldr	r2, [r7, #4]
- 8001074:	4413      	add	r3, r2
- 8001076:	681b      	ldr	r3, [r3, #0]
- 8001078:	617b      	str	r3, [r7, #20]
+ 8000d9a:	69bb      	ldr	r3, [r7, #24]
+ 8000d9c:	3b04      	subs	r3, #4
+ 8000d9e:	687a      	ldr	r2, [r7, #4]
+ 8000da0:	4413      	add	r3, r2
+ 8000da2:	681b      	ldr	r3, [r3, #0]
+ 8000da4:	617b      	str	r3, [r7, #20]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 800107a:	69bb      	ldr	r3, [r7, #24]
- 800107c:	3b04      	subs	r3, #4
- 800107e:	697a      	ldr	r2, [r7, #20]
- 8001080:	4619      	mov	r1, r3
- 8001082:	6878      	ldr	r0, [r7, #4]
- 8001084:	f7ff fc1c 	bl	80008c0 <bootloader_verify_crc>
- 8001088:	4603      	mov	r3, r0
- 800108a:	2b00      	cmp	r3, #0
- 800108c:	d132      	bne.n	80010f4 <bootloader_handle_go_cmd+0xa8>
+ 8000da6:	69bb      	ldr	r3, [r7, #24]
+ 8000da8:	3b04      	subs	r3, #4
+ 8000daa:	697a      	ldr	r2, [r7, #20]
+ 8000dac:	4619      	mov	r1, r3
+ 8000dae:	6878      	ldr	r0, [r7, #4]
+ 8000db0:	f7ff fc1c 	bl	80005ec <bootloader_verify_crc>
+ 8000db4:	4603      	mov	r3, r0
+ 8000db6:	2b00      	cmp	r3, #0
+ 8000db8:	d132      	bne.n	8000e20 <bootloader_handle_go_cmd+0xa8>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 800108e:	481f      	ldr	r0, [pc, #124]	; (800110c <bootloader_handle_go_cmd+0xc0>)
- 8001090:	f7ff fe2a 	bl	8000ce8 <printmsg>
+ 8000dba:	481f      	ldr	r0, [pc, #124]	; (8000e38 <bootloader_handle_go_cmd+0xc0>)
+ 8000dbc:	f7ff fe2a 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],2);
- 8001094:	687b      	ldr	r3, [r7, #4]
- 8001096:	781b      	ldrb	r3, [r3, #0]
- 8001098:	2102      	movs	r1, #2
- 800109a:	4618      	mov	r0, r3
- 800109c:	f7ff fbe4 	bl	8000868 <bootloader_send_ack>
+ 8000dc0:	687b      	ldr	r3, [r7, #4]
+ 8000dc2:	781b      	ldrb	r3, [r3, #0]
+ 8000dc4:	2102      	movs	r1, #2
+ 8000dc6:	4618      	mov	r0, r3
+ 8000dc8:	f7ff fbe4 	bl	8000594 <bootloader_send_ack>
 
 		//Extract the go address
 		go_address = *((uint32_t *)&bl_rx_buffer[2]);
- 80010a0:	687b      	ldr	r3, [r7, #4]
- 80010a2:	f8d3 3002 	ldr.w	r3, [r3, #2]
- 80010a6:	61fb      	str	r3, [r7, #28]
+ 8000dcc:	687b      	ldr	r3, [r7, #4]
+ 8000dce:	f8d3 3002 	ldr.w	r3, [r3, #2]
+ 8000dd2:	61fb      	str	r3, [r7, #28]
 		printmsg("BL_DEBUG_MSG:GO addr: %#x\r\n",go_address);
- 80010a8:	69f9      	ldr	r1, [r7, #28]
- 80010aa:	4819      	ldr	r0, [pc, #100]	; (8001110 <bootloader_handle_go_cmd+0xc4>)
- 80010ac:	f7ff fe1c 	bl	8000ce8 <printmsg>
+ 8000dd4:	69f9      	ldr	r1, [r7, #28]
+ 8000dd6:	4819      	ldr	r0, [pc, #100]	; (8000e3c <bootloader_handle_go_cmd+0xc4>)
+ 8000dd8:	f7ff fe1c 	bl	8000a14 <printmsg>
 
 		if(verify_address(go_address) == ADDR_VALID)
- 80010b0:	69f8      	ldr	r0, [r7, #28]
- 80010b2:	f7ff fc6b 	bl	800098c <verify_address>
- 80010b6:	4603      	mov	r3, r0
- 80010b8:	2b00      	cmp	r3, #0
- 80010ba:	d111      	bne.n	80010e0 <bootloader_handle_go_cmd+0x94>
+ 8000ddc:	69f8      	ldr	r0, [r7, #28]
+ 8000dde:	f7ff fc6b 	bl	80006b8 <verify_address>
+ 8000de2:	4603      	mov	r3, r0
+ 8000de4:	2b00      	cmp	r3, #0
+ 8000de6:	d111      	bne.n	8000e0c <bootloader_handle_go_cmd+0x94>
 		{
 			// tell the host that address is fine
 			bootloader_uart_write_data(&addr_valid,1);
- 80010bc:	f107 030f 	add.w	r3, r7, #15
- 80010c0:	2101      	movs	r1, #1
- 80010c2:	4618      	mov	r0, r3
- 80010c4:	f7ff fdfc 	bl	8000cc0 <bootloader_uart_write_data>
+ 8000de8:	f107 030f 	add.w	r3, r7, #15
+ 8000dec:	2101      	movs	r1, #1
+ 8000dee:	4618      	mov	r0, r3
+ 8000df0:	f7ff fdfc 	bl	80009ec <bootloader_uart_write_data>
 			 *  It is not bootloader's duty, so just trust and jump
 			 */
 
 			/* Not doing the below line will result in hardfault exception for ARM cortex M */
 			//watch: https://www.youtube.com/watch?v=VX_12SjnNhY
 			go_address|=1; //Make T bit = 1
- 80010c8:	69fb      	ldr	r3, [r7, #28]
- 80010ca:	f043 0301 	orr.w	r3, r3, #1
- 80010ce:	61fb      	str	r3, [r7, #28]
+ 8000df4:	69fb      	ldr	r3, [r7, #28]
+ 8000df6:	f043 0301 	orr.w	r3, r3, #1
+ 8000dfa:	61fb      	str	r3, [r7, #28]
 
 			void (*lets_jump)(void) = (void*)go_address;
- 80010d0:	69fb      	ldr	r3, [r7, #28]
- 80010d2:	613b      	str	r3, [r7, #16]
+ 8000dfc:	69fb      	ldr	r3, [r7, #28]
+ 8000dfe:	613b      	str	r3, [r7, #16]
 
 			printmsg("BL_DEBUG_MSG: jumping to go address!\r\n");
- 80010d4:	480f      	ldr	r0, [pc, #60]	; (8001114 <bootloader_handle_go_cmd+0xc8>)
- 80010d6:	f7ff fe07 	bl	8000ce8 <printmsg>
+ 8000e00:	480f      	ldr	r0, [pc, #60]	; (8000e40 <bootloader_handle_go_cmd+0xc8>)
+ 8000e02:	f7ff fe07 	bl	8000a14 <printmsg>
 
 			lets_jump();
- 80010da:	693b      	ldr	r3, [r7, #16]
- 80010dc:	4798      	blx	r3
+ 8000e06:	693b      	ldr	r3, [r7, #16]
+ 8000e08:	4798      	blx	r3
 	else
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 }
- 80010de:	e00e      	b.n	80010fe <bootloader_handle_go_cmd+0xb2>
+ 8000e0a:	e00e      	b.n	8000e2a <bootloader_handle_go_cmd+0xb2>
 			printmsg("BL_DEBUG_MSG: GO address invalid!\r\n");
- 80010e0:	480d      	ldr	r0, [pc, #52]	; (8001118 <bootloader_handle_go_cmd+0xcc>)
- 80010e2:	f7ff fe01 	bl	8000ce8 <printmsg>
+ 8000e0c:	480d      	ldr	r0, [pc, #52]	; (8000e44 <bootloader_handle_go_cmd+0xcc>)
+ 8000e0e:	f7ff fe01 	bl	8000a14 <printmsg>
 			bootloader_uart_write_data(&addr_invalid,1);
- 80010e6:	f107 030e 	add.w	r3, r7, #14
- 80010ea:	2101      	movs	r1, #1
- 80010ec:	4618      	mov	r0, r3
- 80010ee:	f7ff fde7 	bl	8000cc0 <bootloader_uart_write_data>
+ 8000e12:	f107 030e 	add.w	r3, r7, #14
+ 8000e16:	2101      	movs	r1, #1
+ 8000e18:	4618      	mov	r0, r3
+ 8000e1a:	f7ff fde7 	bl	80009ec <bootloader_uart_write_data>
 }
- 80010f2:	e004      	b.n	80010fe <bootloader_handle_go_cmd+0xb2>
+ 8000e1e:	e004      	b.n	8000e2a <bootloader_handle_go_cmd+0xb2>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 80010f4:	4809      	ldr	r0, [pc, #36]	; (800111c <bootloader_handle_go_cmd+0xd0>)
- 80010f6:	f7ff fdf7 	bl	8000ce8 <printmsg>
+ 8000e20:	4809      	ldr	r0, [pc, #36]	; (8000e48 <bootloader_handle_go_cmd+0xd0>)
+ 8000e22:	f7ff fdf7 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 80010fa:	f7ff fbcf 	bl	800089c <bootloader_send_nack>
+ 8000e26:	f7ff fbcf 	bl	80005c8 <bootloader_send_nack>
 }
- 80010fe:	bf00      	nop
- 8001100:	3720      	adds	r7, #32
- 8001102:	46bd      	mov	sp, r7
- 8001104:	bd80      	pop	{r7, pc}
- 8001106:	bf00      	nop
- 8001108:	08004468 	.word	0x08004468
- 800110c:	08004310 	.word	0x08004310
- 8001110:	08004494 	.word	0x08004494
- 8001114:	080044b0 	.word	0x080044b0
- 8001118:	080044d8 	.word	0x080044d8
- 800111c:	080043a4 	.word	0x080043a4
+ 8000e2a:	bf00      	nop
+ 8000e2c:	3720      	adds	r7, #32
+ 8000e2e:	46bd      	mov	sp, r7
+ 8000e30:	bd80      	pop	{r7, pc}
+ 8000e32:	bf00      	nop
+ 8000e34:	080043f4 	.word	0x080043f4
+ 8000e38:	0800429c 	.word	0x0800429c
+ 8000e3c:	08004420 	.word	0x08004420
+ 8000e40:	0800443c 	.word	0x0800443c
+ 8000e44:	08004464 	.word	0x08004464
+ 8000e48:	08004330 	.word	0x08004330
 
-08001120 <bootloader_handle_flash_erase_cmd>:
+08000e4c <bootloader_handle_flash_erase_cmd>:
 
 void bootloader_handle_flash_erase_cmd(uint8_t *bl_rx_buffer)
 {
- 8001120:	b580      	push	{r7, lr}
- 8001122:	b086      	sub	sp, #24
- 8001124:	af00      	add	r7, sp, #0
- 8001126:	6078      	str	r0, [r7, #4]
+ 8000e4c:	b580      	push	{r7, lr}
+ 8000e4e:	b086      	sub	sp, #24
+ 8000e50:	af00      	add	r7, sp, #0
+ 8000e52:	6078      	str	r0, [r7, #4]
 	uint8_t erase_status = 0x00;
- 8001128:	2300      	movs	r3, #0
- 800112a:	73fb      	strb	r3, [r7, #15]
+ 8000e54:	2300      	movs	r3, #0
+ 8000e56:	73fb      	strb	r3, [r7, #15]
 
 	printmsg("BL_DEBUG_MSG::bootloader_handle_flash_erase_cmd\r\n");
- 800112c:	482a      	ldr	r0, [pc, #168]	; (80011d8 <bootloader_handle_flash_erase_cmd+0xb8>)
- 800112e:	f7ff fddb 	bl	8000ce8 <printmsg>
+ 8000e58:	482a      	ldr	r0, [pc, #168]	; (8000f04 <bootloader_handle_flash_erase_cmd+0xb8>)
+ 8000e5a:	f7ff fddb 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 8001132:	687b      	ldr	r3, [r7, #4]
- 8001134:	781b      	ldrb	r3, [r3, #0]
- 8001136:	3301      	adds	r3, #1
- 8001138:	617b      	str	r3, [r7, #20]
+ 8000e5e:	687b      	ldr	r3, [r7, #4]
+ 8000e60:	781b      	ldrb	r3, [r3, #0]
+ 8000e62:	3301      	adds	r3, #1
+ 8000e64:	617b      	str	r3, [r7, #20]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 800113a:	697b      	ldr	r3, [r7, #20]
- 800113c:	3b04      	subs	r3, #4
- 800113e:	687a      	ldr	r2, [r7, #4]
- 8001140:	4413      	add	r3, r2
- 8001142:	681b      	ldr	r3, [r3, #0]
- 8001144:	613b      	str	r3, [r7, #16]
+ 8000e66:	697b      	ldr	r3, [r7, #20]
+ 8000e68:	3b04      	subs	r3, #4
+ 8000e6a:	687a      	ldr	r2, [r7, #4]
+ 8000e6c:	4413      	add	r3, r2
+ 8000e6e:	681b      	ldr	r3, [r3, #0]
+ 8000e70:	613b      	str	r3, [r7, #16]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 8001146:	697b      	ldr	r3, [r7, #20]
- 8001148:	3b04      	subs	r3, #4
- 800114a:	693a      	ldr	r2, [r7, #16]
- 800114c:	4619      	mov	r1, r3
- 800114e:	6878      	ldr	r0, [r7, #4]
- 8001150:	f7ff fbb6 	bl	80008c0 <bootloader_verify_crc>
- 8001154:	4603      	mov	r3, r0
- 8001156:	2b00      	cmp	r3, #0
- 8001158:	d135      	bne.n	80011c6 <bootloader_handle_flash_erase_cmd+0xa6>
+ 8000e72:	697b      	ldr	r3, [r7, #20]
+ 8000e74:	3b04      	subs	r3, #4
+ 8000e76:	693a      	ldr	r2, [r7, #16]
+ 8000e78:	4619      	mov	r1, r3
+ 8000e7a:	6878      	ldr	r0, [r7, #4]
+ 8000e7c:	f7ff fbb6 	bl	80005ec <bootloader_verify_crc>
+ 8000e80:	4603      	mov	r3, r0
+ 8000e82:	2b00      	cmp	r3, #0
+ 8000e84:	d135      	bne.n	8000ef2 <bootloader_handle_flash_erase_cmd+0xa6>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 800115a:	4820      	ldr	r0, [pc, #128]	; (80011dc <bootloader_handle_flash_erase_cmd+0xbc>)
- 800115c:	f7ff fdc4 	bl	8000ce8 <printmsg>
+ 8000e86:	4820      	ldr	r0, [pc, #128]	; (8000f08 <bootloader_handle_flash_erase_cmd+0xbc>)
+ 8000e88:	f7ff fdc4 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],2);
- 8001160:	687b      	ldr	r3, [r7, #4]
- 8001162:	781b      	ldrb	r3, [r3, #0]
- 8001164:	2102      	movs	r1, #2
- 8001166:	4618      	mov	r0, r3
- 8001168:	f7ff fb7e 	bl	8000868 <bootloader_send_ack>
+ 8000e8c:	687b      	ldr	r3, [r7, #4]
+ 8000e8e:	781b      	ldrb	r3, [r3, #0]
+ 8000e90:	2102      	movs	r1, #2
+ 8000e92:	4618      	mov	r0, r3
+ 8000e94:	f7ff fb7e 	bl	8000594 <bootloader_send_ack>
 
 
 		printmsg("BL_DEBUG_MSG:Initial sector: %d   no_of_sectors: %d\r\n",bl_rx_buffer[2],bl_rx_buffer[3]);
- 800116c:	687b      	ldr	r3, [r7, #4]
- 800116e:	3302      	adds	r3, #2
- 8001170:	781b      	ldrb	r3, [r3, #0]
- 8001172:	4619      	mov	r1, r3
- 8001174:	687b      	ldr	r3, [r7, #4]
- 8001176:	3303      	adds	r3, #3
- 8001178:	781b      	ldrb	r3, [r3, #0]
- 800117a:	461a      	mov	r2, r3
- 800117c:	4818      	ldr	r0, [pc, #96]	; (80011e0 <bootloader_handle_flash_erase_cmd+0xc0>)
- 800117e:	f7ff fdb3 	bl	8000ce8 <printmsg>
+ 8000e98:	687b      	ldr	r3, [r7, #4]
+ 8000e9a:	3302      	adds	r3, #2
+ 8000e9c:	781b      	ldrb	r3, [r3, #0]
+ 8000e9e:	4619      	mov	r1, r3
+ 8000ea0:	687b      	ldr	r3, [r7, #4]
+ 8000ea2:	3303      	adds	r3, #3
+ 8000ea4:	781b      	ldrb	r3, [r3, #0]
+ 8000ea6:	461a      	mov	r2, r3
+ 8000ea8:	4818      	ldr	r0, [pc, #96]	; (8000f0c <bootloader_handle_flash_erase_cmd+0xc0>)
+ 8000eaa:	f7ff fdb3 	bl	8000a14 <printmsg>
 
 		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
- 8001182:	2201      	movs	r2, #1
- 8001184:	2120      	movs	r1, #32
- 8001186:	4817      	ldr	r0, [pc, #92]	; (80011e4 <bootloader_handle_flash_erase_cmd+0xc4>)
- 8001188:	f001 fa7a 	bl	8002680 <HAL_GPIO_WritePin>
+ 8000eae:	2201      	movs	r2, #1
+ 8000eb0:	2120      	movs	r1, #32
+ 8000eb2:	4817      	ldr	r0, [pc, #92]	; (8000f10 <bootloader_handle_flash_erase_cmd+0xc4>)
+ 8000eb4:	f001 fbe4 	bl	8002680 <HAL_GPIO_WritePin>
 		erase_status = execute_flash_erase(bl_rx_buffer[2],bl_rx_buffer[3]);
- 800118c:	687b      	ldr	r3, [r7, #4]
- 800118e:	3302      	adds	r3, #2
- 8001190:	781a      	ldrb	r2, [r3, #0]
- 8001192:	687b      	ldr	r3, [r7, #4]
- 8001194:	3303      	adds	r3, #3
- 8001196:	781b      	ldrb	r3, [r3, #0]
- 8001198:	4619      	mov	r1, r3
- 800119a:	4610      	mov	r0, r2
- 800119c:	f7ff fc1a 	bl	80009d4 <execute_flash_erase>
- 80011a0:	4603      	mov	r3, r0
- 80011a2:	73fb      	strb	r3, [r7, #15]
+ 8000eb8:	687b      	ldr	r3, [r7, #4]
+ 8000eba:	3302      	adds	r3, #2
+ 8000ebc:	781a      	ldrb	r2, [r3, #0]
+ 8000ebe:	687b      	ldr	r3, [r7, #4]
+ 8000ec0:	3303      	adds	r3, #3
+ 8000ec2:	781b      	ldrb	r3, [r3, #0]
+ 8000ec4:	4619      	mov	r1, r3
+ 8000ec6:	4610      	mov	r0, r2
+ 8000ec8:	f7ff fc1a 	bl	8000700 <execute_flash_erase>
+ 8000ecc:	4603      	mov	r3, r0
+ 8000ece:	73fb      	strb	r3, [r7, #15]
 		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
- 80011a4:	2200      	movs	r2, #0
- 80011a6:	2120      	movs	r1, #32
- 80011a8:	480e      	ldr	r0, [pc, #56]	; (80011e4 <bootloader_handle_flash_erase_cmd+0xc4>)
- 80011aa:	f001 fa69 	bl	8002680 <HAL_GPIO_WritePin>
+ 8000ed0:	2200      	movs	r2, #0
+ 8000ed2:	2120      	movs	r1, #32
+ 8000ed4:	480e      	ldr	r0, [pc, #56]	; (8000f10 <bootloader_handle_flash_erase_cmd+0xc4>)
+ 8000ed6:	f001 fbd3 	bl	8002680 <HAL_GPIO_WritePin>
 
 		printmsg("BL_DEBUG_MSG:Flash erase status: %#x\r\n",erase_status);
- 80011ae:	7bfb      	ldrb	r3, [r7, #15]
- 80011b0:	4619      	mov	r1, r3
- 80011b2:	480d      	ldr	r0, [pc, #52]	; (80011e8 <bootloader_handle_flash_erase_cmd+0xc8>)
- 80011b4:	f7ff fd98 	bl	8000ce8 <printmsg>
+ 8000eda:	7bfb      	ldrb	r3, [r7, #15]
+ 8000edc:	4619      	mov	r1, r3
+ 8000ede:	480d      	ldr	r0, [pc, #52]	; (8000f14 <bootloader_handle_flash_erase_cmd+0xc8>)
+ 8000ee0:	f7ff fd98 	bl	8000a14 <printmsg>
 		bootloader_uart_write_data(((uint8_t*)&erase_status), 1);
- 80011b8:	f107 030f 	add.w	r3, r7, #15
- 80011bc:	2101      	movs	r1, #1
- 80011be:	4618      	mov	r0, r3
- 80011c0:	f7ff fd7e 	bl	8000cc0 <bootloader_uart_write_data>
+ 8000ee4:	f107 030f 	add.w	r3, r7, #15
+ 8000ee8:	2101      	movs	r1, #1
+ 8000eea:	4618      	mov	r0, r3
+ 8000eec:	f7ff fd7e 	bl	80009ec <bootloader_uart_write_data>
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 
 }
- 80011c4:	e004      	b.n	80011d0 <bootloader_handle_flash_erase_cmd+0xb0>
+ 8000ef0:	e004      	b.n	8000efc <bootloader_handle_flash_erase_cmd+0xb0>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 80011c6:	4809      	ldr	r0, [pc, #36]	; (80011ec <bootloader_handle_flash_erase_cmd+0xcc>)
- 80011c8:	f7ff fd8e 	bl	8000ce8 <printmsg>
+ 8000ef2:	4809      	ldr	r0, [pc, #36]	; (8000f18 <bootloader_handle_flash_erase_cmd+0xcc>)
+ 8000ef4:	f7ff fd8e 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 80011cc:	f7ff fb66 	bl	800089c <bootloader_send_nack>
+ 8000ef8:	f7ff fb66 	bl	80005c8 <bootloader_send_nack>
 }
- 80011d0:	bf00      	nop
- 80011d2:	3718      	adds	r7, #24
- 80011d4:	46bd      	mov	sp, r7
- 80011d6:	bd80      	pop	{r7, pc}
- 80011d8:	080044fc 	.word	0x080044fc
- 80011dc:	08004310 	.word	0x08004310
- 80011e0:	08004530 	.word	0x08004530
- 80011e4:	40020000 	.word	0x40020000
- 80011e8:	08004568 	.word	0x08004568
- 80011ec:	080043a4 	.word	0x080043a4
+ 8000efc:	bf00      	nop
+ 8000efe:	3718      	adds	r7, #24
+ 8000f00:	46bd      	mov	sp, r7
+ 8000f02:	bd80      	pop	{r7, pc}
+ 8000f04:	08004488 	.word	0x08004488
+ 8000f08:	0800429c 	.word	0x0800429c
+ 8000f0c:	080044bc 	.word	0x080044bc
+ 8000f10:	40020000 	.word	0x40020000
+ 8000f14:	080044f4 	.word	0x080044f4
+ 8000f18:	08004330 	.word	0x08004330
 
-080011f0 <bootloader_handle_mem_write_cmd>:
+08000f1c <bootloader_handle_mem_write_cmd>:
 
 void bootloader_handle_mem_write_cmd(uint8_t *bl_rx_buffer)
 {
- 80011f0:	b580      	push	{r7, lr}
- 80011f2:	b088      	sub	sp, #32
- 80011f4:	af00      	add	r7, sp, #0
- 80011f6:	6078      	str	r0, [r7, #4]
+ 8000f1c:	b580      	push	{r7, lr}
+ 8000f1e:	b088      	sub	sp, #32
+ 8000f20:	af00      	add	r7, sp, #0
+ 8000f22:	6078      	str	r0, [r7, #4]
 	uint8_t addr_valid = ADDR_VALID;
- 80011f8:	2300      	movs	r3, #0
- 80011fa:	77fb      	strb	r3, [r7, #31]
+ 8000f24:	2300      	movs	r3, #0
+ 8000f26:	77fb      	strb	r3, [r7, #31]
 	uint8_t write_status = 0x00;
- 80011fc:	2300      	movs	r3, #0
- 80011fe:	73fb      	strb	r3, [r7, #15]
+ 8000f28:	2300      	movs	r3, #0
+ 8000f2a:	73fb      	strb	r3, [r7, #15]
 	uint8_t chksum = 0;
- 8001200:	2300      	movs	r3, #0
- 8001202:	77bb      	strb	r3, [r7, #30]
+ 8000f2c:	2300      	movs	r3, #0
+ 8000f2e:	77bb      	strb	r3, [r7, #30]
 	uint8_t len = bl_rx_buffer[0];
- 8001204:	687b      	ldr	r3, [r7, #4]
- 8001206:	781b      	ldrb	r3, [r3, #0]
- 8001208:	777b      	strb	r3, [r7, #29]
+ 8000f30:	687b      	ldr	r3, [r7, #4]
+ 8000f32:	781b      	ldrb	r3, [r3, #0]
+ 8000f34:	777b      	strb	r3, [r7, #29]
 	uint8_t payload_len = bl_rx_buffer[6];
- 800120a:	687b      	ldr	r3, [r7, #4]
- 800120c:	799b      	ldrb	r3, [r3, #6]
- 800120e:	773b      	strb	r3, [r7, #28]
+ 8000f36:	687b      	ldr	r3, [r7, #4]
+ 8000f38:	799b      	ldrb	r3, [r3, #6]
+ 8000f3a:	773b      	strb	r3, [r7, #28]
 
 	uint32_t mem_address = *((uint32_t *)(&bl_rx_buffer[2]));
- 8001210:	687b      	ldr	r3, [r7, #4]
- 8001212:	f8d3 3002 	ldr.w	r3, [r3, #2]
- 8001216:	61bb      	str	r3, [r7, #24]
+ 8000f3c:	687b      	ldr	r3, [r7, #4]
+ 8000f3e:	f8d3 3002 	ldr.w	r3, [r3, #2]
+ 8000f42:	61bb      	str	r3, [r7, #24]
 
 	chksum = bl_rx_buffer[len];
- 8001218:	7f7b      	ldrb	r3, [r7, #29]
- 800121a:	687a      	ldr	r2, [r7, #4]
- 800121c:	4413      	add	r3, r2
- 800121e:	781b      	ldrb	r3, [r3, #0]
- 8001220:	77bb      	strb	r3, [r7, #30]
+ 8000f44:	7f7b      	ldrb	r3, [r7, #29]
+ 8000f46:	687a      	ldr	r2, [r7, #4]
+ 8000f48:	4413      	add	r3, r2
+ 8000f4a:	781b      	ldrb	r3, [r3, #0]
+ 8000f4c:	77bb      	strb	r3, [r7, #30]
 
 	printmsg("BL_DEBUG_MSG::bootloader_handle_mem_write_cmd\r\n");
- 8001222:	4830      	ldr	r0, [pc, #192]	; (80012e4 <bootloader_handle_mem_write_cmd+0xf4>)
- 8001224:	f7ff fd60 	bl	8000ce8 <printmsg>
+ 8000f4e:	4830      	ldr	r0, [pc, #192]	; (8001010 <bootloader_handle_mem_write_cmd+0xf4>)
+ 8000f50:	f7ff fd60 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 8001228:	687b      	ldr	r3, [r7, #4]
- 800122a:	781b      	ldrb	r3, [r3, #0]
- 800122c:	3301      	adds	r3, #1
- 800122e:	617b      	str	r3, [r7, #20]
+ 8000f54:	687b      	ldr	r3, [r7, #4]
+ 8000f56:	781b      	ldrb	r3, [r3, #0]
+ 8000f58:	3301      	adds	r3, #1
+ 8000f5a:	617b      	str	r3, [r7, #20]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 8001230:	697b      	ldr	r3, [r7, #20]
- 8001232:	3b04      	subs	r3, #4
- 8001234:	687a      	ldr	r2, [r7, #4]
- 8001236:	4413      	add	r3, r2
- 8001238:	681b      	ldr	r3, [r3, #0]
- 800123a:	613b      	str	r3, [r7, #16]
+ 8000f5c:	697b      	ldr	r3, [r7, #20]
+ 8000f5e:	3b04      	subs	r3, #4
+ 8000f60:	687a      	ldr	r2, [r7, #4]
+ 8000f62:	4413      	add	r3, r2
+ 8000f64:	681b      	ldr	r3, [r3, #0]
+ 8000f66:	613b      	str	r3, [r7, #16]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 800123c:	697b      	ldr	r3, [r7, #20]
- 800123e:	3b04      	subs	r3, #4
- 8001240:	693a      	ldr	r2, [r7, #16]
- 8001242:	4619      	mov	r1, r3
- 8001244:	6878      	ldr	r0, [r7, #4]
- 8001246:	f7ff fb3b 	bl	80008c0 <bootloader_verify_crc>
- 800124a:	4603      	mov	r3, r0
- 800124c:	2b00      	cmp	r3, #0
- 800124e:	d140      	bne.n	80012d2 <bootloader_handle_mem_write_cmd+0xe2>
+ 8000f68:	697b      	ldr	r3, [r7, #20]
+ 8000f6a:	3b04      	subs	r3, #4
+ 8000f6c:	693a      	ldr	r2, [r7, #16]
+ 8000f6e:	4619      	mov	r1, r3
+ 8000f70:	6878      	ldr	r0, [r7, #4]
+ 8000f72:	f7ff fb3b 	bl	80005ec <bootloader_verify_crc>
+ 8000f76:	4603      	mov	r3, r0
+ 8000f78:	2b00      	cmp	r3, #0
+ 8000f7a:	d140      	bne.n	8000ffe <bootloader_handle_mem_write_cmd+0xe2>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 8001250:	4825      	ldr	r0, [pc, #148]	; (80012e8 <bootloader_handle_mem_write_cmd+0xf8>)
- 8001252:	f7ff fd49 	bl	8000ce8 <printmsg>
+ 8000f7c:	4825      	ldr	r0, [pc, #148]	; (8001014 <bootloader_handle_mem_write_cmd+0xf8>)
+ 8000f7e:	f7ff fd49 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],2);
- 8001256:	687b      	ldr	r3, [r7, #4]
- 8001258:	781b      	ldrb	r3, [r3, #0]
- 800125a:	2102      	movs	r1, #2
- 800125c:	4618      	mov	r0, r3
- 800125e:	f7ff fb03 	bl	8000868 <bootloader_send_ack>
+ 8000f82:	687b      	ldr	r3, [r7, #4]
+ 8000f84:	781b      	ldrb	r3, [r3, #0]
+ 8000f86:	2102      	movs	r1, #2
+ 8000f88:	4618      	mov	r0, r3
+ 8000f8a:	f7ff fb03 	bl	8000594 <bootloader_send_ack>
 
 		printmsg("BL_DEBUG_MSG: mem write address: %#x\r\n",mem_address);
- 8001262:	69b9      	ldr	r1, [r7, #24]
- 8001264:	4821      	ldr	r0, [pc, #132]	; (80012ec <bootloader_handle_mem_write_cmd+0xfc>)
- 8001266:	f7ff fd3f 	bl	8000ce8 <printmsg>
+ 8000f8e:	69b9      	ldr	r1, [r7, #24]
+ 8000f90:	4821      	ldr	r0, [pc, #132]	; (8001018 <bootloader_handle_mem_write_cmd+0xfc>)
+ 8000f92:	f7ff fd3f 	bl	8000a14 <printmsg>
 
 		if(verify_address(mem_address) == ADDR_VALID)
- 800126a:	69b8      	ldr	r0, [r7, #24]
- 800126c:	f7ff fb8e 	bl	800098c <verify_address>
- 8001270:	4603      	mov	r3, r0
- 8001272:	2b00      	cmp	r3, #0
- 8001274:	d121      	bne.n	80012ba <bootloader_handle_mem_write_cmd+0xca>
+ 8000f96:	69b8      	ldr	r0, [r7, #24]
+ 8000f98:	f7ff fb8e 	bl	80006b8 <verify_address>
+ 8000f9c:	4603      	mov	r3, r0
+ 8000f9e:	2b00      	cmp	r3, #0
+ 8000fa0:	d121      	bne.n	8000fe6 <bootloader_handle_mem_write_cmd+0xca>
 		{
 			printmsg("BL_DEBUG_MSG: valid mem write address\r\n");
- 8001276:	481e      	ldr	r0, [pc, #120]	; (80012f0 <bootloader_handle_mem_write_cmd+0x100>)
- 8001278:	f7ff fd36 	bl	8000ce8 <printmsg>
+ 8000fa2:	481e      	ldr	r0, [pc, #120]	; (800101c <bootloader_handle_mem_write_cmd+0x100>)
+ 8000fa4:	f7ff fd36 	bl	8000a14 <printmsg>
 
 			// glow the led to indicate bootloader is currently writing to memory
 			HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,GPIO_PIN_SET);
- 800127c:	2201      	movs	r2, #1
- 800127e:	2120      	movs	r1, #32
- 8001280:	481c      	ldr	r0, [pc, #112]	; (80012f4 <bootloader_handle_mem_write_cmd+0x104>)
- 8001282:	f001 f9fd 	bl	8002680 <HAL_GPIO_WritePin>
+ 8000fa8:	2201      	movs	r2, #1
+ 8000faa:	2120      	movs	r1, #32
+ 8000fac:	481c      	ldr	r0, [pc, #112]	; (8001020 <bootloader_handle_mem_write_cmd+0x104>)
+ 8000fae:	f001 fb67 	bl	8002680 <HAL_GPIO_WritePin>
 
 			// execute mem write
 			write_status = execute_mem_write(&bl_rx_buffer[7],mem_address,payload_len);
- 8001286:	687b      	ldr	r3, [r7, #4]
- 8001288:	3307      	adds	r3, #7
- 800128a:	7f3a      	ldrb	r2, [r7, #28]
- 800128c:	69b9      	ldr	r1, [r7, #24]
- 800128e:	4618      	mov	r0, r3
- 8001290:	f7ff fbe7 	bl	8000a62 <execute_mem_write>
- 8001294:	4603      	mov	r3, r0
- 8001296:	73fb      	strb	r3, [r7, #15]
+ 8000fb2:	687b      	ldr	r3, [r7, #4]
+ 8000fb4:	3307      	adds	r3, #7
+ 8000fb6:	7f3a      	ldrb	r2, [r7, #28]
+ 8000fb8:	69b9      	ldr	r1, [r7, #24]
+ 8000fba:	4618      	mov	r0, r3
+ 8000fbc:	f7ff fbe7 	bl	800078e <execute_mem_write>
+ 8000fc0:	4603      	mov	r3, r0
+ 8000fc2:	73fb      	strb	r3, [r7, #15]
 
 			// turn off the led to indicate bootloader finished writing to memory
 			HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,GPIO_PIN_RESET);
- 8001298:	2200      	movs	r2, #0
- 800129a:	2120      	movs	r1, #32
- 800129c:	4815      	ldr	r0, [pc, #84]	; (80012f4 <bootloader_handle_mem_write_cmd+0x104>)
- 800129e:	f001 f9ef 	bl	8002680 <HAL_GPIO_WritePin>
+ 8000fc4:	2200      	movs	r2, #0
+ 8000fc6:	2120      	movs	r1, #32
+ 8000fc8:	4815      	ldr	r0, [pc, #84]	; (8001020 <bootloader_handle_mem_write_cmd+0x104>)
+ 8000fca:	f001 fb59 	bl	8002680 <HAL_GPIO_WritePin>
 
 			printmsg("BL_DEBUG_MSG:Write status: %#x\r\n",write_status);
- 80012a2:	7bfb      	ldrb	r3, [r7, #15]
- 80012a4:	4619      	mov	r1, r3
- 80012a6:	4814      	ldr	r0, [pc, #80]	; (80012f8 <bootloader_handle_mem_write_cmd+0x108>)
- 80012a8:	f7ff fd1e 	bl	8000ce8 <printmsg>
+ 8000fce:	7bfb      	ldrb	r3, [r7, #15]
+ 8000fd0:	4619      	mov	r1, r3
+ 8000fd2:	4814      	ldr	r0, [pc, #80]	; (8001024 <bootloader_handle_mem_write_cmd+0x108>)
+ 8000fd4:	f7ff fd1e 	bl	8000a14 <printmsg>
 			bootloader_uart_write_data(((uint8_t*)&write_status), 1);
- 80012ac:	f107 030f 	add.w	r3, r7, #15
- 80012b0:	2101      	movs	r1, #1
- 80012b2:	4618      	mov	r0, r3
- 80012b4:	f7ff fd04 	bl	8000cc0 <bootloader_uart_write_data>
+ 8000fd8:	f107 030f 	add.w	r3, r7, #15
+ 8000fdc:	2101      	movs	r1, #1
+ 8000fde:	4618      	mov	r0, r3
+ 8000fe0:	f7ff fd04 	bl	80009ec <bootloader_uart_write_data>
 	else
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 }
- 80012b8:	e010      	b.n	80012dc <bootloader_handle_mem_write_cmd+0xec>
+ 8000fe4:	e010      	b.n	8001008 <bootloader_handle_mem_write_cmd+0xec>
 			printmsg("BL_DEBUG_MSG: invalid mem write address\r\n");
- 80012ba:	4810      	ldr	r0, [pc, #64]	; (80012fc <bootloader_handle_mem_write_cmd+0x10c>)
- 80012bc:	f7ff fd14 	bl	8000ce8 <printmsg>
+ 8000fe6:	4810      	ldr	r0, [pc, #64]	; (8001028 <bootloader_handle_mem_write_cmd+0x10c>)
+ 8000fe8:	f7ff fd14 	bl	8000a14 <printmsg>
 			write_status = ADDR_INVALID;
- 80012c0:	2301      	movs	r3, #1
- 80012c2:	73fb      	strb	r3, [r7, #15]
+ 8000fec:	2301      	movs	r3, #1
+ 8000fee:	73fb      	strb	r3, [r7, #15]
 			bootloader_uart_write_data(&write_status, 1);
- 80012c4:	f107 030f 	add.w	r3, r7, #15
- 80012c8:	2101      	movs	r1, #1
- 80012ca:	4618      	mov	r0, r3
- 80012cc:	f7ff fcf8 	bl	8000cc0 <bootloader_uart_write_data>
+ 8000ff0:	f107 030f 	add.w	r3, r7, #15
+ 8000ff4:	2101      	movs	r1, #1
+ 8000ff6:	4618      	mov	r0, r3
+ 8000ff8:	f7ff fcf8 	bl	80009ec <bootloader_uart_write_data>
 }
- 80012d0:	e004      	b.n	80012dc <bootloader_handle_mem_write_cmd+0xec>
+ 8000ffc:	e004      	b.n	8001008 <bootloader_handle_mem_write_cmd+0xec>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 80012d2:	480b      	ldr	r0, [pc, #44]	; (8001300 <bootloader_handle_mem_write_cmd+0x110>)
- 80012d4:	f7ff fd08 	bl	8000ce8 <printmsg>
+ 8000ffe:	480b      	ldr	r0, [pc, #44]	; (800102c <bootloader_handle_mem_write_cmd+0x110>)
+ 8001000:	f7ff fd08 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 80012d8:	f7ff fae0 	bl	800089c <bootloader_send_nack>
+ 8001004:	f7ff fae0 	bl	80005c8 <bootloader_send_nack>
 }
- 80012dc:	bf00      	nop
- 80012de:	3720      	adds	r7, #32
- 80012e0:	46bd      	mov	sp, r7
- 80012e2:	bd80      	pop	{r7, pc}
- 80012e4:	08004590 	.word	0x08004590
- 80012e8:	08004310 	.word	0x08004310
- 80012ec:	080045c0 	.word	0x080045c0
- 80012f0:	080045e8 	.word	0x080045e8
- 80012f4:	40020000 	.word	0x40020000
- 80012f8:	08004610 	.word	0x08004610
- 80012fc:	08004634 	.word	0x08004634
- 8001300:	080043a4 	.word	0x080043a4
+ 8001008:	bf00      	nop
+ 800100a:	3720      	adds	r7, #32
+ 800100c:	46bd      	mov	sp, r7
+ 800100e:	bd80      	pop	{r7, pc}
+ 8001010:	0800451c 	.word	0x0800451c
+ 8001014:	0800429c 	.word	0x0800429c
+ 8001018:	0800454c 	.word	0x0800454c
+ 800101c:	08004574 	.word	0x08004574
+ 8001020:	40020000 	.word	0x40020000
+ 8001024:	0800459c 	.word	0x0800459c
+ 8001028:	080045c0 	.word	0x080045c0
+ 800102c:	08004330 	.word	0x08004330
 
-08001304 <bootloader_handle_endis_rw_protect_cmd>:
+08001030 <bootloader_handle_endis_rw_protect_cmd>:
 
 void bootloader_handle_endis_rw_protect_cmd(uint8_t *bl_rx_buffer)
 {
- 8001304:	b580      	push	{r7, lr}
- 8001306:	b086      	sub	sp, #24
- 8001308:	af00      	add	r7, sp, #0
- 800130a:	6078      	str	r0, [r7, #4]
+ 8001030:	b580      	push	{r7, lr}
+ 8001032:	b086      	sub	sp, #24
+ 8001034:	af00      	add	r7, sp, #0
+ 8001036:	6078      	str	r0, [r7, #4]
 	uint8_t status = 0x00;
- 800130c:	2300      	movs	r3, #0
- 800130e:	73fb      	strb	r3, [r7, #15]
+ 8001038:	2300      	movs	r3, #0
+ 800103a:	73fb      	strb	r3, [r7, #15]
 	printmsg("BL_DEBUG_MSG::bootloader_handle_endis_rw_protect_cmd\r\n");
- 8001310:	4820      	ldr	r0, [pc, #128]	; (8001394 <bootloader_handle_endis_rw_protect_cmd+0x90>)
- 8001312:	f7ff fce9 	bl	8000ce8 <printmsg>
+ 800103c:	4820      	ldr	r0, [pc, #128]	; (80010c0 <bootloader_handle_endis_rw_protect_cmd+0x90>)
+ 800103e:	f7ff fce9 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 8001316:	687b      	ldr	r3, [r7, #4]
- 8001318:	781b      	ldrb	r3, [r3, #0]
- 800131a:	3301      	adds	r3, #1
- 800131c:	617b      	str	r3, [r7, #20]
+ 8001042:	687b      	ldr	r3, [r7, #4]
+ 8001044:	781b      	ldrb	r3, [r3, #0]
+ 8001046:	3301      	adds	r3, #1
+ 8001048:	617b      	str	r3, [r7, #20]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 800131e:	697b      	ldr	r3, [r7, #20]
- 8001320:	3b04      	subs	r3, #4
- 8001322:	687a      	ldr	r2, [r7, #4]
- 8001324:	4413      	add	r3, r2
- 8001326:	681b      	ldr	r3, [r3, #0]
- 8001328:	613b      	str	r3, [r7, #16]
+ 800104a:	697b      	ldr	r3, [r7, #20]
+ 800104c:	3b04      	subs	r3, #4
+ 800104e:	687a      	ldr	r2, [r7, #4]
+ 8001050:	4413      	add	r3, r2
+ 8001052:	681b      	ldr	r3, [r3, #0]
+ 8001054:	613b      	str	r3, [r7, #16]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 800132a:	697b      	ldr	r3, [r7, #20]
- 800132c:	3b04      	subs	r3, #4
- 800132e:	693a      	ldr	r2, [r7, #16]
- 8001330:	4619      	mov	r1, r3
- 8001332:	6878      	ldr	r0, [r7, #4]
- 8001334:	f7ff fac4 	bl	80008c0 <bootloader_verify_crc>
- 8001338:	4603      	mov	r3, r0
- 800133a:	2b00      	cmp	r3, #0
- 800133c:	d120      	bne.n	8001380 <bootloader_handle_endis_rw_protect_cmd+0x7c>
+ 8001056:	697b      	ldr	r3, [r7, #20]
+ 8001058:	3b04      	subs	r3, #4
+ 800105a:	693a      	ldr	r2, [r7, #16]
+ 800105c:	4619      	mov	r1, r3
+ 800105e:	6878      	ldr	r0, [r7, #4]
+ 8001060:	f7ff fac4 	bl	80005ec <bootloader_verify_crc>
+ 8001064:	4603      	mov	r3, r0
+ 8001066:	2b00      	cmp	r3, #0
+ 8001068:	d120      	bne.n	80010ac <bootloader_handle_endis_rw_protect_cmd+0x7c>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 800133e:	4816      	ldr	r0, [pc, #88]	; (8001398 <bootloader_handle_endis_rw_protect_cmd+0x94>)
- 8001340:	f7ff fcd2 	bl	8000ce8 <printmsg>
+ 800106a:	4816      	ldr	r0, [pc, #88]	; (80010c4 <bootloader_handle_endis_rw_protect_cmd+0x94>)
+ 800106c:	f7ff fcd2 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],1);
- 8001344:	687b      	ldr	r3, [r7, #4]
- 8001346:	781b      	ldrb	r3, [r3, #0]
- 8001348:	2101      	movs	r1, #1
- 800134a:	4618      	mov	r0, r3
- 800134c:	f7ff fa8c 	bl	8000868 <bootloader_send_ack>
+ 8001070:	687b      	ldr	r3, [r7, #4]
+ 8001072:	781b      	ldrb	r3, [r3, #0]
+ 8001074:	2101      	movs	r1, #1
+ 8001076:	4618      	mov	r0, r3
+ 8001078:	f7ff fa8c 	bl	8000594 <bootloader_send_ack>
 
 		status = configure_flash_sector_rw_protection(bl_rx_buffer[2],bl_rx_buffer[3],0);
- 8001350:	687b      	ldr	r3, [r7, #4]
- 8001352:	3302      	adds	r3, #2
- 8001354:	7818      	ldrb	r0, [r3, #0]
- 8001356:	687b      	ldr	r3, [r7, #4]
- 8001358:	3303      	adds	r3, #3
- 800135a:	781b      	ldrb	r3, [r3, #0]
- 800135c:	2200      	movs	r2, #0
- 800135e:	4619      	mov	r1, r3
- 8001360:	f7ff fbda 	bl	8000b18 <configure_flash_sector_rw_protection>
- 8001364:	4603      	mov	r3, r0
- 8001366:	73fb      	strb	r3, [r7, #15]
+ 800107c:	687b      	ldr	r3, [r7, #4]
+ 800107e:	3302      	adds	r3, #2
+ 8001080:	7818      	ldrb	r0, [r3, #0]
+ 8001082:	687b      	ldr	r3, [r7, #4]
+ 8001084:	3303      	adds	r3, #3
+ 8001086:	781b      	ldrb	r3, [r3, #0]
+ 8001088:	2200      	movs	r2, #0
+ 800108a:	4619      	mov	r1, r3
+ 800108c:	f7ff fbda 	bl	8000844 <configure_flash_sector_rw_protection>
+ 8001090:	4603      	mov	r3, r0
+ 8001092:	73fb      	strb	r3, [r7, #15]
 
 		printmsg("BL_DEBUG_MSG: flash erase status: %#x\n",status);
- 8001368:	7bfb      	ldrb	r3, [r7, #15]
- 800136a:	4619      	mov	r1, r3
- 800136c:	480b      	ldr	r0, [pc, #44]	; (800139c <bootloader_handle_endis_rw_protect_cmd+0x98>)
- 800136e:	f7ff fcbb 	bl	8000ce8 <printmsg>
+ 8001094:	7bfb      	ldrb	r3, [r7, #15]
+ 8001096:	4619      	mov	r1, r3
+ 8001098:	480b      	ldr	r0, [pc, #44]	; (80010c8 <bootloader_handle_endis_rw_protect_cmd+0x98>)
+ 800109a:	f7ff fcbb 	bl	8000a14 <printmsg>
 
 		bootloader_uart_write_data(((uint8_t*)&status), 1);
- 8001372:	f107 030f 	add.w	r3, r7, #15
- 8001376:	2101      	movs	r1, #1
- 8001378:	4618      	mov	r0, r3
- 800137a:	f7ff fca1 	bl	8000cc0 <bootloader_uart_write_data>
+ 800109e:	f107 030f 	add.w	r3, r7, #15
+ 80010a2:	2101      	movs	r1, #1
+ 80010a4:	4618      	mov	r0, r3
+ 80010a6:	f7ff fca1 	bl	80009ec <bootloader_uart_write_data>
 	else
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 }
- 800137e:	e004      	b.n	800138a <bootloader_handle_endis_rw_protect_cmd+0x86>
+ 80010aa:	e004      	b.n	80010b6 <bootloader_handle_endis_rw_protect_cmd+0x86>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 8001380:	4807      	ldr	r0, [pc, #28]	; (80013a0 <bootloader_handle_endis_rw_protect_cmd+0x9c>)
- 8001382:	f7ff fcb1 	bl	8000ce8 <printmsg>
+ 80010ac:	4807      	ldr	r0, [pc, #28]	; (80010cc <bootloader_handle_endis_rw_protect_cmd+0x9c>)
+ 80010ae:	f7ff fcb1 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 8001386:	f7ff fa89 	bl	800089c <bootloader_send_nack>
+ 80010b2:	f7ff fa89 	bl	80005c8 <bootloader_send_nack>
 }
- 800138a:	bf00      	nop
- 800138c:	3718      	adds	r7, #24
- 800138e:	46bd      	mov	sp, r7
- 8001390:	bd80      	pop	{r7, pc}
- 8001392:	bf00      	nop
- 8001394:	08004660 	.word	0x08004660
- 8001398:	08004310 	.word	0x08004310
- 800139c:	08004698 	.word	0x08004698
- 80013a0:	080043a4 	.word	0x080043a4
+ 80010b6:	bf00      	nop
+ 80010b8:	3718      	adds	r7, #24
+ 80010ba:	46bd      	mov	sp, r7
+ 80010bc:	bd80      	pop	{r7, pc}
+ 80010be:	bf00      	nop
+ 80010c0:	080045ec 	.word	0x080045ec
+ 80010c4:	0800429c 	.word	0x0800429c
+ 80010c8:	08004624 	.word	0x08004624
+ 80010cc:	08004330 	.word	0x08004330
 
-080013a4 <bootloader_handle_mem_read_cmd>:
+080010d0 <bootloader_handle_mem_read_cmd>:
 
 void bootloader_handle_mem_read_cmd(uint8_t *bl_rx_buffer)
 {
- 80013a4:	b580      	push	{r7, lr}
- 80013a6:	b088      	sub	sp, #32
- 80013a8:	af00      	add	r7, sp, #0
- 80013aa:	6078      	str	r0, [r7, #4]
+ 80010d0:	b580      	push	{r7, lr}
+ 80010d2:	b088      	sub	sp, #32
+ 80010d4:	af00      	add	r7, sp, #0
+ 80010d6:	6078      	str	r0, [r7, #4]
 	uint8_t addr_valid = ADDR_VALID;
- 80013ac:	2300      	movs	r3, #0
- 80013ae:	77fb      	strb	r3, [r7, #31]
+ 80010d8:	2300      	movs	r3, #0
+ 80010da:	77fb      	strb	r3, [r7, #31]
 	uint8_t read_status = 0x00;
- 80013b0:	2300      	movs	r3, #0
- 80013b2:	73fb      	strb	r3, [r7, #15]
+ 80010dc:	2300      	movs	r3, #0
+ 80010de:	73fb      	strb	r3, [r7, #15]
 	uint8_t payload_len = bl_rx_buffer[6];
- 80013b4:	687b      	ldr	r3, [r7, #4]
- 80013b6:	799b      	ldrb	r3, [r3, #6]
- 80013b8:	77bb      	strb	r3, [r7, #30]
+ 80010e0:	687b      	ldr	r3, [r7, #4]
+ 80010e2:	799b      	ldrb	r3, [r3, #6]
+ 80010e4:	77bb      	strb	r3, [r7, #30]
 
 	uint32_t mem_address = *((uint32_t *)(&bl_rx_buffer[2]));
- 80013ba:	687b      	ldr	r3, [r7, #4]
- 80013bc:	f8d3 3002 	ldr.w	r3, [r3, #2]
- 80013c0:	61bb      	str	r3, [r7, #24]
+ 80010e6:	687b      	ldr	r3, [r7, #4]
+ 80010e8:	f8d3 3002 	ldr.w	r3, [r3, #2]
+ 80010ec:	61bb      	str	r3, [r7, #24]
 
 	printmsg("BL_DEBUG_MSG::bootloader_handle_mem_read_cmd\r\n");
- 80013c2:	4830      	ldr	r0, [pc, #192]	; (8001484 <bootloader_handle_mem_read_cmd+0xe0>)
- 80013c4:	f7ff fc90 	bl	8000ce8 <printmsg>
+ 80010ee:	4830      	ldr	r0, [pc, #192]	; (80011b0 <bootloader_handle_mem_read_cmd+0xe0>)
+ 80010f0:	f7ff fc90 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 80013c8:	687b      	ldr	r3, [r7, #4]
- 80013ca:	781b      	ldrb	r3, [r3, #0]
- 80013cc:	3301      	adds	r3, #1
- 80013ce:	617b      	str	r3, [r7, #20]
+ 80010f4:	687b      	ldr	r3, [r7, #4]
+ 80010f6:	781b      	ldrb	r3, [r3, #0]
+ 80010f8:	3301      	adds	r3, #1
+ 80010fa:	617b      	str	r3, [r7, #20]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 80013d0:	697b      	ldr	r3, [r7, #20]
- 80013d2:	3b04      	subs	r3, #4
- 80013d4:	687a      	ldr	r2, [r7, #4]
- 80013d6:	4413      	add	r3, r2
- 80013d8:	681b      	ldr	r3, [r3, #0]
- 80013da:	613b      	str	r3, [r7, #16]
+ 80010fc:	697b      	ldr	r3, [r7, #20]
+ 80010fe:	3b04      	subs	r3, #4
+ 8001100:	687a      	ldr	r2, [r7, #4]
+ 8001102:	4413      	add	r3, r2
+ 8001104:	681b      	ldr	r3, [r3, #0]
+ 8001106:	613b      	str	r3, [r7, #16]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 80013dc:	697b      	ldr	r3, [r7, #20]
- 80013de:	3b04      	subs	r3, #4
- 80013e0:	693a      	ldr	r2, [r7, #16]
- 80013e2:	4619      	mov	r1, r3
- 80013e4:	6878      	ldr	r0, [r7, #4]
- 80013e6:	f7ff fa6b 	bl	80008c0 <bootloader_verify_crc>
- 80013ea:	4603      	mov	r3, r0
- 80013ec:	2b00      	cmp	r3, #0
- 80013ee:	d140      	bne.n	8001472 <bootloader_handle_mem_read_cmd+0xce>
+ 8001108:	697b      	ldr	r3, [r7, #20]
+ 800110a:	3b04      	subs	r3, #4
+ 800110c:	693a      	ldr	r2, [r7, #16]
+ 800110e:	4619      	mov	r1, r3
+ 8001110:	6878      	ldr	r0, [r7, #4]
+ 8001112:	f7ff fa6b 	bl	80005ec <bootloader_verify_crc>
+ 8001116:	4603      	mov	r3, r0
+ 8001118:	2b00      	cmp	r3, #0
+ 800111a:	d140      	bne.n	800119e <bootloader_handle_mem_read_cmd+0xce>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 80013f0:	4825      	ldr	r0, [pc, #148]	; (8001488 <bootloader_handle_mem_read_cmd+0xe4>)
- 80013f2:	f7ff fc79 	bl	8000ce8 <printmsg>
+ 800111c:	4825      	ldr	r0, [pc, #148]	; (80011b4 <bootloader_handle_mem_read_cmd+0xe4>)
+ 800111e:	f7ff fc79 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],1);
- 80013f6:	687b      	ldr	r3, [r7, #4]
- 80013f8:	781b      	ldrb	r3, [r3, #0]
- 80013fa:	2101      	movs	r1, #1
- 80013fc:	4618      	mov	r0, r3
- 80013fe:	f7ff fa33 	bl	8000868 <bootloader_send_ack>
+ 8001122:	687b      	ldr	r3, [r7, #4]
+ 8001124:	781b      	ldrb	r3, [r3, #0]
+ 8001126:	2101      	movs	r1, #1
+ 8001128:	4618      	mov	r0, r3
+ 800112a:	f7ff fa33 	bl	8000594 <bootloader_send_ack>
 
 		printmsg("BL_DEBUG_MSG: mem read address: %#x\r\n",mem_address);
- 8001402:	69b9      	ldr	r1, [r7, #24]
- 8001404:	4821      	ldr	r0, [pc, #132]	; (800148c <bootloader_handle_mem_read_cmd+0xe8>)
- 8001406:	f7ff fc6f 	bl	8000ce8 <printmsg>
+ 800112e:	69b9      	ldr	r1, [r7, #24]
+ 8001130:	4821      	ldr	r0, [pc, #132]	; (80011b8 <bootloader_handle_mem_read_cmd+0xe8>)
+ 8001132:	f7ff fc6f 	bl	8000a14 <printmsg>
 
 		if(verify_address(mem_address) == ADDR_VALID)
- 800140a:	69b8      	ldr	r0, [r7, #24]
- 800140c:	f7ff fabe 	bl	800098c <verify_address>
- 8001410:	4603      	mov	r3, r0
- 8001412:	2b00      	cmp	r3, #0
- 8001414:	d121      	bne.n	800145a <bootloader_handle_mem_read_cmd+0xb6>
+ 8001136:	69b8      	ldr	r0, [r7, #24]
+ 8001138:	f7ff fabe 	bl	80006b8 <verify_address>
+ 800113c:	4603      	mov	r3, r0
+ 800113e:	2b00      	cmp	r3, #0
+ 8001140:	d121      	bne.n	8001186 <bootloader_handle_mem_read_cmd+0xb6>
 		{
 			printmsg("BL_DEBUG_MSG: valid mem read address\r\n");
- 8001416:	481e      	ldr	r0, [pc, #120]	; (8001490 <bootloader_handle_mem_read_cmd+0xec>)
- 8001418:	f7ff fc66 	bl	8000ce8 <printmsg>
+ 8001142:	481e      	ldr	r0, [pc, #120]	; (80011bc <bootloader_handle_mem_read_cmd+0xec>)
+ 8001144:	f7ff fc66 	bl	8000a14 <printmsg>
 
 			// glow the led to indicate bootloader is currently reading to memory
 			HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,GPIO_PIN_SET);
- 800141c:	2201      	movs	r2, #1
- 800141e:	2120      	movs	r1, #32
- 8001420:	481c      	ldr	r0, [pc, #112]	; (8001494 <bootloader_handle_mem_read_cmd+0xf0>)
- 8001422:	f001 f92d 	bl	8002680 <HAL_GPIO_WritePin>
+ 8001148:	2201      	movs	r2, #1
+ 800114a:	2120      	movs	r1, #32
+ 800114c:	481c      	ldr	r0, [pc, #112]	; (80011c0 <bootloader_handle_mem_read_cmd+0xf0>)
+ 800114e:	f001 fa97 	bl	8002680 <HAL_GPIO_WritePin>
 
 			// execute mem read
 			read_status = execute_mem_read(&bl_rx_buffer[7],mem_address,payload_len);
- 8001426:	687b      	ldr	r3, [r7, #4]
- 8001428:	3307      	adds	r3, #7
- 800142a:	7fba      	ldrb	r2, [r7, #30]
- 800142c:	69b9      	ldr	r1, [r7, #24]
- 800142e:	4618      	mov	r0, r3
- 8001430:	f7ff fb44 	bl	8000abc <execute_mem_read>
- 8001434:	4603      	mov	r3, r0
- 8001436:	73fb      	strb	r3, [r7, #15]
+ 8001152:	687b      	ldr	r3, [r7, #4]
+ 8001154:	3307      	adds	r3, #7
+ 8001156:	7fba      	ldrb	r2, [r7, #30]
+ 8001158:	69b9      	ldr	r1, [r7, #24]
+ 800115a:	4618      	mov	r0, r3
+ 800115c:	f7ff fb44 	bl	80007e8 <execute_mem_read>
+ 8001160:	4603      	mov	r3, r0
+ 8001162:	73fb      	strb	r3, [r7, #15]
 
 			// turn off the led to indicate bootloader finished reading to memory
 			HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,GPIO_PIN_RESET);
- 8001438:	2200      	movs	r2, #0
- 800143a:	2120      	movs	r1, #32
- 800143c:	4815      	ldr	r0, [pc, #84]	; (8001494 <bootloader_handle_mem_read_cmd+0xf0>)
- 800143e:	f001 f91f 	bl	8002680 <HAL_GPIO_WritePin>
+ 8001164:	2200      	movs	r2, #0
+ 8001166:	2120      	movs	r1, #32
+ 8001168:	4815      	ldr	r0, [pc, #84]	; (80011c0 <bootloader_handle_mem_read_cmd+0xf0>)
+ 800116a:	f001 fa89 	bl	8002680 <HAL_GPIO_WritePin>
 
 			printmsg("BL_DEBUG_MSG:Read status: %#x\r\n",read_status);
- 8001442:	7bfb      	ldrb	r3, [r7, #15]
- 8001444:	4619      	mov	r1, r3
- 8001446:	4814      	ldr	r0, [pc, #80]	; (8001498 <bootloader_handle_mem_read_cmd+0xf4>)
- 8001448:	f7ff fc4e 	bl	8000ce8 <printmsg>
+ 800116e:	7bfb      	ldrb	r3, [r7, #15]
+ 8001170:	4619      	mov	r1, r3
+ 8001172:	4814      	ldr	r0, [pc, #80]	; (80011c4 <bootloader_handle_mem_read_cmd+0xf4>)
+ 8001174:	f7ff fc4e 	bl	8000a14 <printmsg>
 			bootloader_uart_write_data(((uint8_t*)&read_status), 1);
- 800144c:	f107 030f 	add.w	r3, r7, #15
- 8001450:	2101      	movs	r1, #1
- 8001452:	4618      	mov	r0, r3
- 8001454:	f7ff fc34 	bl	8000cc0 <bootloader_uart_write_data>
+ 8001178:	f107 030f 	add.w	r3, r7, #15
+ 800117c:	2101      	movs	r1, #1
+ 800117e:	4618      	mov	r0, r3
+ 8001180:	f7ff fc34 	bl	80009ec <bootloader_uart_write_data>
 	else
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 }
- 8001458:	e010      	b.n	800147c <bootloader_handle_mem_read_cmd+0xd8>
+ 8001184:	e010      	b.n	80011a8 <bootloader_handle_mem_read_cmd+0xd8>
 			printmsg("BL_DEBUG_MSG: invalid mem read address\r\n");
- 800145a:	4810      	ldr	r0, [pc, #64]	; (800149c <bootloader_handle_mem_read_cmd+0xf8>)
- 800145c:	f7ff fc44 	bl	8000ce8 <printmsg>
+ 8001186:	4810      	ldr	r0, [pc, #64]	; (80011c8 <bootloader_handle_mem_read_cmd+0xf8>)
+ 8001188:	f7ff fc44 	bl	8000a14 <printmsg>
 			read_status = ADDR_INVALID;
- 8001460:	2301      	movs	r3, #1
- 8001462:	73fb      	strb	r3, [r7, #15]
+ 800118c:	2301      	movs	r3, #1
+ 800118e:	73fb      	strb	r3, [r7, #15]
 			bootloader_uart_write_data(&read_status, 1);
- 8001464:	f107 030f 	add.w	r3, r7, #15
- 8001468:	2101      	movs	r1, #1
- 800146a:	4618      	mov	r0, r3
- 800146c:	f7ff fc28 	bl	8000cc0 <bootloader_uart_write_data>
+ 8001190:	f107 030f 	add.w	r3, r7, #15
+ 8001194:	2101      	movs	r1, #1
+ 8001196:	4618      	mov	r0, r3
+ 8001198:	f7ff fc28 	bl	80009ec <bootloader_uart_write_data>
 }
- 8001470:	e004      	b.n	800147c <bootloader_handle_mem_read_cmd+0xd8>
+ 800119c:	e004      	b.n	80011a8 <bootloader_handle_mem_read_cmd+0xd8>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 8001472:	480b      	ldr	r0, [pc, #44]	; (80014a0 <bootloader_handle_mem_read_cmd+0xfc>)
- 8001474:	f7ff fc38 	bl	8000ce8 <printmsg>
+ 800119e:	480b      	ldr	r0, [pc, #44]	; (80011cc <bootloader_handle_mem_read_cmd+0xfc>)
+ 80011a0:	f7ff fc38 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 8001478:	f7ff fa10 	bl	800089c <bootloader_send_nack>
+ 80011a4:	f7ff fa10 	bl	80005c8 <bootloader_send_nack>
 }
- 800147c:	bf00      	nop
- 800147e:	3720      	adds	r7, #32
- 8001480:	46bd      	mov	sp, r7
- 8001482:	bd80      	pop	{r7, pc}
- 8001484:	080046c0 	.word	0x080046c0
- 8001488:	08004310 	.word	0x08004310
- 800148c:	080046f0 	.word	0x080046f0
- 8001490:	08004718 	.word	0x08004718
- 8001494:	40020000 	.word	0x40020000
- 8001498:	08004740 	.word	0x08004740
- 800149c:	08004760 	.word	0x08004760
- 80014a0:	080043a4 	.word	0x080043a4
+ 80011a8:	bf00      	nop
+ 80011aa:	3720      	adds	r7, #32
+ 80011ac:	46bd      	mov	sp, r7
+ 80011ae:	bd80      	pop	{r7, pc}
+ 80011b0:	0800464c 	.word	0x0800464c
+ 80011b4:	0800429c 	.word	0x0800429c
+ 80011b8:	0800467c 	.word	0x0800467c
+ 80011bc:	080046a4 	.word	0x080046a4
+ 80011c0:	40020000 	.word	0x40020000
+ 80011c4:	080046cc 	.word	0x080046cc
+ 80011c8:	080046ec 	.word	0x080046ec
+ 80011cc:	08004330 	.word	0x08004330
 
-080014a4 <bootloader_handle_read_sector_status_cmd>:
+080011d0 <bootloader_handle_read_sector_status_cmd>:
 
 void bootloader_handle_read_sector_status_cmd(uint8_t *bl_rx_buffer)
 {
- 80014a4:	b580      	push	{r7, lr}
- 80014a6:	b086      	sub	sp, #24
- 80014a8:	af00      	add	r7, sp, #0
- 80014aa:	6078      	str	r0, [r7, #4]
+ 80011d0:	b580      	push	{r7, lr}
+ 80011d2:	b086      	sub	sp, #24
+ 80011d4:	af00      	add	r7, sp, #0
+ 80011d6:	6078      	str	r0, [r7, #4]
 	uint16_t read_status=0x00;
- 80014ac:	2300      	movs	r3, #0
- 80014ae:	81fb      	strh	r3, [r7, #14]
+ 80011d8:	2300      	movs	r3, #0
+ 80011da:	81fb      	strh	r3, [r7, #14]
 
 	printmsg("BL_DEBUG_MSG::bootloader_handle_read_sector_status_cmd\r\n");
- 80014b0:	481c      	ldr	r0, [pc, #112]	; (8001524 <bootloader_handle_read_sector_status_cmd+0x80>)
- 80014b2:	f7ff fc19 	bl	8000ce8 <printmsg>
+ 80011dc:	481c      	ldr	r0, [pc, #112]	; (8001250 <bootloader_handle_read_sector_status_cmd+0x80>)
+ 80011de:	f7ff fc19 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 80014b6:	687b      	ldr	r3, [r7, #4]
- 80014b8:	781b      	ldrb	r3, [r3, #0]
- 80014ba:	3301      	adds	r3, #1
- 80014bc:	617b      	str	r3, [r7, #20]
+ 80011e2:	687b      	ldr	r3, [r7, #4]
+ 80011e4:	781b      	ldrb	r3, [r3, #0]
+ 80011e6:	3301      	adds	r3, #1
+ 80011e8:	617b      	str	r3, [r7, #20]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 80014be:	697b      	ldr	r3, [r7, #20]
- 80014c0:	3b04      	subs	r3, #4
- 80014c2:	687a      	ldr	r2, [r7, #4]
- 80014c4:	4413      	add	r3, r2
- 80014c6:	681b      	ldr	r3, [r3, #0]
- 80014c8:	613b      	str	r3, [r7, #16]
+ 80011ea:	697b      	ldr	r3, [r7, #20]
+ 80011ec:	3b04      	subs	r3, #4
+ 80011ee:	687a      	ldr	r2, [r7, #4]
+ 80011f0:	4413      	add	r3, r2
+ 80011f2:	681b      	ldr	r3, [r3, #0]
+ 80011f4:	613b      	str	r3, [r7, #16]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 80014ca:	697b      	ldr	r3, [r7, #20]
- 80014cc:	3b04      	subs	r3, #4
- 80014ce:	693a      	ldr	r2, [r7, #16]
- 80014d0:	4619      	mov	r1, r3
- 80014d2:	6878      	ldr	r0, [r7, #4]
- 80014d4:	f7ff f9f4 	bl	80008c0 <bootloader_verify_crc>
- 80014d8:	4603      	mov	r3, r0
- 80014da:	2b00      	cmp	r3, #0
- 80014dc:	d118      	bne.n	8001510 <bootloader_handle_read_sector_status_cmd+0x6c>
+ 80011f6:	697b      	ldr	r3, [r7, #20]
+ 80011f8:	3b04      	subs	r3, #4
+ 80011fa:	693a      	ldr	r2, [r7, #16]
+ 80011fc:	4619      	mov	r1, r3
+ 80011fe:	6878      	ldr	r0, [r7, #4]
+ 8001200:	f7ff f9f4 	bl	80005ec <bootloader_verify_crc>
+ 8001204:	4603      	mov	r3, r0
+ 8001206:	2b00      	cmp	r3, #0
+ 8001208:	d118      	bne.n	800123c <bootloader_handle_read_sector_status_cmd+0x6c>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 80014de:	4812      	ldr	r0, [pc, #72]	; (8001528 <bootloader_handle_read_sector_status_cmd+0x84>)
- 80014e0:	f7ff fc02 	bl	8000ce8 <printmsg>
+ 800120a:	4812      	ldr	r0, [pc, #72]	; (8001254 <bootloader_handle_read_sector_status_cmd+0x84>)
+ 800120c:	f7ff fc02 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],1);
- 80014e4:	687b      	ldr	r3, [r7, #4]
- 80014e6:	781b      	ldrb	r3, [r3, #0]
- 80014e8:	2101      	movs	r1, #1
- 80014ea:	4618      	mov	r0, r3
- 80014ec:	f7ff f9bc 	bl	8000868 <bootloader_send_ack>
+ 8001210:	687b      	ldr	r3, [r7, #4]
+ 8001212:	781b      	ldrb	r3, [r3, #0]
+ 8001214:	2101      	movs	r1, #1
+ 8001216:	4618      	mov	r0, r3
+ 8001218:	f7ff f9bc 	bl	8000594 <bootloader_send_ack>
 
 		read_status = read_flash_sector_rw_protection();
- 80014f0:	f7ff fba8 	bl	8000c44 <read_flash_sector_rw_protection>
- 80014f4:	4603      	mov	r3, r0
- 80014f6:	81fb      	strh	r3, [r7, #14]
+ 800121c:	f7ff fba8 	bl	8000970 <read_flash_sector_rw_protection>
+ 8001220:	4603      	mov	r3, r0
+ 8001222:	81fb      	strh	r3, [r7, #14]
 
 		printmsg("BL_DEBUG_MSG:Read status: %#x\r\n",read_status);
- 80014f8:	89fb      	ldrh	r3, [r7, #14]
- 80014fa:	4619      	mov	r1, r3
- 80014fc:	480b      	ldr	r0, [pc, #44]	; (800152c <bootloader_handle_read_sector_status_cmd+0x88>)
- 80014fe:	f7ff fbf3 	bl	8000ce8 <printmsg>
+ 8001224:	89fb      	ldrh	r3, [r7, #14]
+ 8001226:	4619      	mov	r1, r3
+ 8001228:	480b      	ldr	r0, [pc, #44]	; (8001258 <bootloader_handle_read_sector_status_cmd+0x88>)
+ 800122a:	f7ff fbf3 	bl	8000a14 <printmsg>
 		bootloader_uart_write_data(((uint8_t*)&read_status), 2);
- 8001502:	f107 030e 	add.w	r3, r7, #14
- 8001506:	2102      	movs	r1, #2
- 8001508:	4618      	mov	r0, r3
- 800150a:	f7ff fbd9 	bl	8000cc0 <bootloader_uart_write_data>
+ 800122e:	f107 030e 	add.w	r3, r7, #14
+ 8001232:	2102      	movs	r1, #2
+ 8001234:	4618      	mov	r0, r3
+ 8001236:	f7ff fbd9 	bl	80009ec <bootloader_uart_write_data>
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 
 }
- 800150e:	e004      	b.n	800151a <bootloader_handle_read_sector_status_cmd+0x76>
+ 800123a:	e004      	b.n	8001246 <bootloader_handle_read_sector_status_cmd+0x76>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 8001510:	4807      	ldr	r0, [pc, #28]	; (8001530 <bootloader_handle_read_sector_status_cmd+0x8c>)
- 8001512:	f7ff fbe9 	bl	8000ce8 <printmsg>
+ 800123c:	4807      	ldr	r0, [pc, #28]	; (800125c <bootloader_handle_read_sector_status_cmd+0x8c>)
+ 800123e:	f7ff fbe9 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 8001516:	f7ff f9c1 	bl	800089c <bootloader_send_nack>
+ 8001242:	f7ff f9c1 	bl	80005c8 <bootloader_send_nack>
 }
- 800151a:	bf00      	nop
- 800151c:	3718      	adds	r7, #24
- 800151e:	46bd      	mov	sp, r7
- 8001520:	bd80      	pop	{r7, pc}
- 8001522:	bf00      	nop
- 8001524:	0800478c 	.word	0x0800478c
- 8001528:	08004310 	.word	0x08004310
- 800152c:	08004740 	.word	0x08004740
- 8001530:	080043a4 	.word	0x080043a4
+ 8001246:	bf00      	nop
+ 8001248:	3718      	adds	r7, #24
+ 800124a:	46bd      	mov	sp, r7
+ 800124c:	bd80      	pop	{r7, pc}
+ 800124e:	bf00      	nop
+ 8001250:	08004718 	.word	0x08004718
+ 8001254:	0800429c 	.word	0x0800429c
+ 8001258:	080046cc 	.word	0x080046cc
+ 800125c:	08004330 	.word	0x08004330
 
-08001534 <bootloader_handle_otp_read_cmd>:
+08001260 <bootloader_handle_otp_read_cmd>:
 
 void bootloader_handle_otp_read_cmd(uint8_t *bl_rx_buffer)
 {
- 8001534:	b480      	push	{r7}
- 8001536:	b083      	sub	sp, #12
- 8001538:	af00      	add	r7, sp, #0
- 800153a:	6078      	str	r0, [r7, #4]
+ 8001260:	b480      	push	{r7}
+ 8001262:	b083      	sub	sp, #12
+ 8001264:	af00      	add	r7, sp, #0
+ 8001266:	6078      	str	r0, [r7, #4]
 
 }
- 800153c:	bf00      	nop
- 800153e:	370c      	adds	r7, #12
- 8001540:	46bd      	mov	sp, r7
- 8001542:	f85d 7b04 	ldr.w	r7, [sp], #4
- 8001546:	4770      	bx	lr
+ 8001268:	bf00      	nop
+ 800126a:	370c      	adds	r7, #12
+ 800126c:	46bd      	mov	sp, r7
+ 800126e:	f85d 7b04 	ldr.w	r7, [sp], #4
+ 8001272:	4770      	bx	lr
 
-08001548 <bootloader_handle_dis_r_w_protect_cmd>:
+08001274 <bootloader_handle_dis_r_w_protect_cmd>:
 
 void bootloader_handle_dis_r_w_protect_cmd(uint8_t *bl_rx_buffer)
 {
- 8001548:	b580      	push	{r7, lr}
- 800154a:	b086      	sub	sp, #24
- 800154c:	af00      	add	r7, sp, #0
- 800154e:	6078      	str	r0, [r7, #4]
+ 8001274:	b580      	push	{r7, lr}
+ 8001276:	b086      	sub	sp, #24
+ 8001278:	af00      	add	r7, sp, #0
+ 800127a:	6078      	str	r0, [r7, #4]
 	uint8_t status = 0x00;
- 8001550:	2300      	movs	r3, #0
- 8001552:	73fb      	strb	r3, [r7, #15]
+ 800127c:	2300      	movs	r3, #0
+ 800127e:	73fb      	strb	r3, [r7, #15]
 	printmsg("BL_DEBUG_MSG::bootloader_handle_dis_rw_protect_cmd\r\n");
- 8001554:	481d      	ldr	r0, [pc, #116]	; (80015cc <bootloader_handle_dis_r_w_protect_cmd+0x84>)
- 8001556:	f7ff fbc7 	bl	8000ce8 <printmsg>
+ 8001280:	481d      	ldr	r0, [pc, #116]	; (80012f8 <bootloader_handle_dis_r_w_protect_cmd+0x84>)
+ 8001282:	f7ff fbc7 	bl	8000a14 <printmsg>
 
 	// Total length of the command packet
 	uint32_t command_packet_len = bl_rx_buffer[0]+1;
- 800155a:	687b      	ldr	r3, [r7, #4]
- 800155c:	781b      	ldrb	r3, [r3, #0]
- 800155e:	3301      	adds	r3, #1
- 8001560:	617b      	str	r3, [r7, #20]
+ 8001286:	687b      	ldr	r3, [r7, #4]
+ 8001288:	781b      	ldrb	r3, [r3, #0]
+ 800128a:	3301      	adds	r3, #1
+ 800128c:	617b      	str	r3, [r7, #20]
 
 	// Extract the CRC32 sent by the host
 	uint32_t host_crc = *((uint32_t *)(bl_rx_buffer+command_packet_len-4));
- 8001562:	697b      	ldr	r3, [r7, #20]
- 8001564:	3b04      	subs	r3, #4
- 8001566:	687a      	ldr	r2, [r7, #4]
- 8001568:	4413      	add	r3, r2
- 800156a:	681b      	ldr	r3, [r3, #0]
- 800156c:	613b      	str	r3, [r7, #16]
+ 800128e:	697b      	ldr	r3, [r7, #20]
+ 8001290:	3b04      	subs	r3, #4
+ 8001292:	687a      	ldr	r2, [r7, #4]
+ 8001294:	4413      	add	r3, r2
+ 8001296:	681b      	ldr	r3, [r3, #0]
+ 8001298:	613b      	str	r3, [r7, #16]
 
 	if(!bootloader_verify_crc(bl_rx_buffer, command_packet_len-4, host_crc))
- 800156e:	697b      	ldr	r3, [r7, #20]
- 8001570:	3b04      	subs	r3, #4
- 8001572:	693a      	ldr	r2, [r7, #16]
- 8001574:	4619      	mov	r1, r3
- 8001576:	6878      	ldr	r0, [r7, #4]
- 8001578:	f7ff f9a2 	bl	80008c0 <bootloader_verify_crc>
- 800157c:	4603      	mov	r3, r0
- 800157e:	2b00      	cmp	r3, #0
- 8001580:	d11b      	bne.n	80015ba <bootloader_handle_dis_r_w_protect_cmd+0x72>
+ 800129a:	697b      	ldr	r3, [r7, #20]
+ 800129c:	3b04      	subs	r3, #4
+ 800129e:	693a      	ldr	r2, [r7, #16]
+ 80012a0:	4619      	mov	r1, r3
+ 80012a2:	6878      	ldr	r0, [r7, #4]
+ 80012a4:	f7ff f9a2 	bl	80005ec <bootloader_verify_crc>
+ 80012a8:	4603      	mov	r3, r0
+ 80012aa:	2b00      	cmp	r3, #0
+ 80012ac:	d11b      	bne.n	80012e6 <bootloader_handle_dis_r_w_protect_cmd+0x72>
 	{
 		printmsg("BL_DEBUG_MSG:checksum success !!\r\n");
- 8001582:	4813      	ldr	r0, [pc, #76]	; (80015d0 <bootloader_handle_dis_r_w_protect_cmd+0x88>)
- 8001584:	f7ff fbb0 	bl	8000ce8 <printmsg>
+ 80012ae:	4813      	ldr	r0, [pc, #76]	; (80012fc <bootloader_handle_dis_r_w_protect_cmd+0x88>)
+ 80012b0:	f7ff fbb0 	bl	8000a14 <printmsg>
 		bootloader_send_ack(bl_rx_buffer[0],1);
- 8001588:	687b      	ldr	r3, [r7, #4]
- 800158a:	781b      	ldrb	r3, [r3, #0]
- 800158c:	2101      	movs	r1, #1
- 800158e:	4618      	mov	r0, r3
- 8001590:	f7ff f96a 	bl	8000868 <bootloader_send_ack>
+ 80012b4:	687b      	ldr	r3, [r7, #4]
+ 80012b6:	781b      	ldrb	r3, [r3, #0]
+ 80012b8:	2101      	movs	r1, #1
+ 80012ba:	4618      	mov	r0, r3
+ 80012bc:	f7ff f96a 	bl	8000594 <bootloader_send_ack>
 
 		status = configure_flash_sector_rw_protection(0,0,1);
- 8001594:	2201      	movs	r2, #1
- 8001596:	2100      	movs	r1, #0
- 8001598:	2000      	movs	r0, #0
- 800159a:	f7ff fabd 	bl	8000b18 <configure_flash_sector_rw_protection>
- 800159e:	4603      	mov	r3, r0
- 80015a0:	73fb      	strb	r3, [r7, #15]
+ 80012c0:	2201      	movs	r2, #1
+ 80012c2:	2100      	movs	r1, #0
+ 80012c4:	2000      	movs	r0, #0
+ 80012c6:	f7ff fabd 	bl	8000844 <configure_flash_sector_rw_protection>
+ 80012ca:	4603      	mov	r3, r0
+ 80012cc:	73fb      	strb	r3, [r7, #15]
 
 		printmsg("BL_DEBUG_MSG: flash erase status: %#x\n",status);
- 80015a2:	7bfb      	ldrb	r3, [r7, #15]
- 80015a4:	4619      	mov	r1, r3
- 80015a6:	480b      	ldr	r0, [pc, #44]	; (80015d4 <bootloader_handle_dis_r_w_protect_cmd+0x8c>)
- 80015a8:	f7ff fb9e 	bl	8000ce8 <printmsg>
+ 80012ce:	7bfb      	ldrb	r3, [r7, #15]
+ 80012d0:	4619      	mov	r1, r3
+ 80012d2:	480b      	ldr	r0, [pc, #44]	; (8001300 <bootloader_handle_dis_r_w_protect_cmd+0x8c>)
+ 80012d4:	f7ff fb9e 	bl	8000a14 <printmsg>
 
 		bootloader_uart_write_data(((uint8_t*)&status), 1);
- 80015ac:	f107 030f 	add.w	r3, r7, #15
- 80015b0:	2101      	movs	r1, #1
- 80015b2:	4618      	mov	r0, r3
- 80015b4:	f7ff fb84 	bl	8000cc0 <bootloader_uart_write_data>
+ 80012d8:	f107 030f 	add.w	r3, r7, #15
+ 80012dc:	2101      	movs	r1, #1
+ 80012de:	4618      	mov	r0, r3
+ 80012e0:	f7ff fb84 	bl	80009ec <bootloader_uart_write_data>
 	else
 	{
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
 		bootloader_send_nack();
 	}
 }
- 80015b8:	e004      	b.n	80015c4 <bootloader_handle_dis_r_w_protect_cmd+0x7c>
+ 80012e4:	e004      	b.n	80012f0 <bootloader_handle_dis_r_w_protect_cmd+0x7c>
 		printmsg("BL_DEBUG_MSG:checksum fail !!\n");
- 80015ba:	4807      	ldr	r0, [pc, #28]	; (80015d8 <bootloader_handle_dis_r_w_protect_cmd+0x90>)
- 80015bc:	f7ff fb94 	bl	8000ce8 <printmsg>
+ 80012e6:	4807      	ldr	r0, [pc, #28]	; (8001304 <bootloader_handle_dis_r_w_protect_cmd+0x90>)
+ 80012e8:	f7ff fb94 	bl	8000a14 <printmsg>
 		bootloader_send_nack();
- 80015c0:	f7ff f96c 	bl	800089c <bootloader_send_nack>
+ 80012ec:	f7ff f96c 	bl	80005c8 <bootloader_send_nack>
 }
- 80015c4:	bf00      	nop
- 80015c6:	3718      	adds	r7, #24
- 80015c8:	46bd      	mov	sp, r7
- 80015ca:	bd80      	pop	{r7, pc}
- 80015cc:	080047c8 	.word	0x080047c8
- 80015d0:	08004310 	.word	0x08004310
- 80015d4:	08004698 	.word	0x08004698
- 80015d8:	080043a4 	.word	0x080043a4
+ 80012f0:	bf00      	nop
+ 80012f2:	3718      	adds	r7, #24
+ 80012f4:	46bd      	mov	sp, r7
+ 80012f6:	bd80      	pop	{r7, pc}
+ 80012f8:	08004754 	.word	0x08004754
+ 80012fc:	0800429c 	.word	0x0800429c
+ 8001300:	08004624 	.word	0x08004624
+ 8001304:	08004330 	.word	0x08004330
 
-080015dc <bootloader_jump_to_user_app>:
+08001308 <bootloader_jump_to_user_app>:
 
 
 void bootloader_jump_to_user_app(void)
 {
- 80015dc:	b580      	push	{r7, lr}
- 80015de:	b084      	sub	sp, #16
- 80015e0:	af00      	add	r7, sp, #0
+ 8001308:	b580      	push	{r7, lr}
+ 800130a:	b084      	sub	sp, #16
+ 800130c:	af00      	add	r7, sp, #0
 	// Just a function pointer to hold the address of the reset handler of the user app
 	void (*app_reset_handler)(void);
 
 	printmsg("BL_DEBUG_MSG:bootloader_jump_to_user_app\r\n");
- 80015e2:	480f      	ldr	r0, [pc, #60]	; (8001620 <bootloader_jump_to_user_app+0x44>)
- 80015e4:	f7ff fb80 	bl	8000ce8 <printmsg>
+ 800130e:	480f      	ldr	r0, [pc, #60]	; (800134c <bootloader_jump_to_user_app+0x44>)
+ 8001310:	f7ff fb80 	bl	8000a14 <printmsg>
 
 	// 1. Configure the MSP by reading the value from the base address of the sector 2
 	uint32_t msp_value = *(volatile uint32_t *)FLASH_SECTOR_2_BASE_ADDRESS;
- 80015e8:	4b0e      	ldr	r3, [pc, #56]	; (8001624 <bootloader_jump_to_user_app+0x48>)
- 80015ea:	681b      	ldr	r3, [r3, #0]
- 80015ec:	60fb      	str	r3, [r7, #12]
+ 8001314:	4b0e      	ldr	r3, [pc, #56]	; (8001350 <bootloader_jump_to_user_app+0x48>)
+ 8001316:	681b      	ldr	r3, [r3, #0]
+ 8001318:	60fb      	str	r3, [r7, #12]
 	printmsg("BL_DEBUG_MSG:MSP value : %#x\r\n",msp_value);
- 80015ee:	68f9      	ldr	r1, [r7, #12]
- 80015f0:	480d      	ldr	r0, [pc, #52]	; (8001628 <bootloader_jump_to_user_app+0x4c>)
- 80015f2:	f7ff fb79 	bl	8000ce8 <printmsg>
- 80015f6:	68fb      	ldr	r3, [r7, #12]
- 80015f8:	603b      	str	r3, [r7, #0]
+ 800131a:	68f9      	ldr	r1, [r7, #12]
+ 800131c:	480d      	ldr	r0, [pc, #52]	; (8001354 <bootloader_jump_to_user_app+0x4c>)
+ 800131e:	f7ff fb79 	bl	8000a14 <printmsg>
+ 8001322:	68fb      	ldr	r3, [r7, #12]
+ 8001324:	603b      	str	r3, [r7, #0]
   \details Assigns the given value to the Main Stack Pointer (MSP).
   \param [in]    topOfMainStack  Main Stack Pointer value to set
  */
 __STATIC_FORCEINLINE void __set_MSP(uint32_t topOfMainStack)
 {
   __ASM volatile ("MSR msp, %0" : : "r" (topOfMainStack) : );
- 80015fa:	683b      	ldr	r3, [r7, #0]
- 80015fc:	f383 8808 	msr	MSP, r3
+ 8001326:	683b      	ldr	r3, [r7, #0]
+ 8001328:	f383 8808 	msr	MSP, r3
 }
- 8001600:	bf00      	nop
+ 800132c:	bf00      	nop
 	//scb->VTOR = FLASH_SECTOR1_BASE_ADDRESS
 
 
 	// 2. Now fetch the reset handler address of the user application
 	//	  from the location FLASH_SECTOR2_BASE_ADDRESS+4
 	uint32_t resethandler_address = *(volatile uint32_t*)(FLASH_SECTOR_2_BASE_ADDRESS+4);
- 8001602:	4b0a      	ldr	r3, [pc, #40]	; (800162c <bootloader_jump_to_user_app+0x50>)
- 8001604:	681b      	ldr	r3, [r3, #0]
- 8001606:	60bb      	str	r3, [r7, #8]
+ 800132e:	4b0a      	ldr	r3, [pc, #40]	; (8001358 <bootloader_jump_to_user_app+0x50>)
+ 8001330:	681b      	ldr	r3, [r3, #0]
+ 8001332:	60bb      	str	r3, [r7, #8]
 
 	app_reset_handler = (void*)resethandler_address;
- 8001608:	68bb      	ldr	r3, [r7, #8]
- 800160a:	607b      	str	r3, [r7, #4]
+ 8001334:	68bb      	ldr	r3, [r7, #8]
+ 8001336:	607b      	str	r3, [r7, #4]
 
 	printmsg("BL_DEBUG_MSG: app reset handler addr: %#x\r\n",app_reset_handler);
- 800160c:	6879      	ldr	r1, [r7, #4]
- 800160e:	4808      	ldr	r0, [pc, #32]	; (8001630 <bootloader_jump_to_user_app+0x54>)
- 8001610:	f7ff fb6a 	bl	8000ce8 <printmsg>
+ 8001338:	6879      	ldr	r1, [r7, #4]
+ 800133a:	4808      	ldr	r0, [pc, #32]	; (800135c <bootloader_jump_to_user_app+0x54>)
+ 800133c:	f7ff fb6a 	bl	8000a14 <printmsg>
 
 
 	// 3. Jump to reset handler of the user application
 	app_reset_handler();
- 8001614:	687b      	ldr	r3, [r7, #4]
- 8001616:	4798      	blx	r3
+ 8001340:	687b      	ldr	r3, [r7, #4]
+ 8001342:	4798      	blx	r3
 }
- 8001618:	bf00      	nop
- 800161a:	3710      	adds	r7, #16
- 800161c:	46bd      	mov	sp, r7
- 800161e:	bd80      	pop	{r7, pc}
- 8001620:	08004800 	.word	0x08004800
- 8001624:	08008000 	.word	0x08008000
- 8001628:	0800482c 	.word	0x0800482c
- 800162c:	08008004 	.word	0x08008004
- 8001630:	0800484c 	.word	0x0800484c
+ 8001344:	bf00      	nop
+ 8001346:	3710      	adds	r7, #16
+ 8001348:	46bd      	mov	sp, r7
+ 800134a:	bd80      	pop	{r7, pc}
+ 800134c:	0800478c 	.word	0x0800478c
+ 8001350:	08008000 	.word	0x08008000
+ 8001354:	080047b8 	.word	0x080047b8
+ 8001358:	08008004 	.word	0x08008004
+ 800135c:	080047d8 	.word	0x080047d8
+
+08001360 <main>:
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
+ 8001360:	b580      	push	{r7, lr}
+ 8001362:	af00      	add	r7, sp, #0
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+  HAL_Init();
+ 8001364:	f000 face 	bl	8001904 <HAL_Init>
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
+  SystemClock_Config();
+ 8001368:	f000 f822 	bl	80013b0 <SystemClock_Config>
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
+  MX_GPIO_Init();
+ 800136c:	f000 f8f4 	bl	8001558 <MX_GPIO_Init>
+  MX_USART2_UART_Init();
+ 8001370:	f000 f8c8 	bl	8001504 <MX_USART2_UART_Init>
+  MX_USART1_UART_Init();
+ 8001374:	f000 f89c 	bl	80014b0 <MX_USART1_UART_Init>
+  MX_CRC_Init();
+ 8001378:	f000 f886 	bl	8001488 <MX_CRC_Init>
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+
+	  // CHeck whether button is pressed or not. If not pressed jump to ...
+	  if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET)
+ 800137c:	f44f 5100 	mov.w	r1, #8192	; 0x2000
+ 8001380:	4808      	ldr	r0, [pc, #32]	; (80013a4 <main+0x44>)
+ 8001382:	f001 f965 	bl	8002650 <HAL_GPIO_ReadPin>
+ 8001386:	4603      	mov	r3, r0
+ 8001388:	2b00      	cmp	r3, #0
+ 800138a:	d105      	bne.n	8001398 <main+0x38>
+	  {
+		  printmsg("BL_DEBUG_MSG:Button is pressed... going to BL mode\r\n");
+ 800138c:	4806      	ldr	r0, [pc, #24]	; (80013a8 <main+0x48>)
+ 800138e:	f7ff fb41 	bl	8000a14 <printmsg>
+
+		  // We should continue in bootloader mode
+		  bootloader_uart_read_data();
+ 8001392:	f7ff fb65 	bl	8000a60 <bootloader_uart_read_data>
+ 8001396:	e7f1      	b.n	800137c <main+0x1c>
+	  }
+	  else
+	  {
+		  printmsg("BL_DEBUG_MSG:Button is not pressed... executing user app\r\n");
+ 8001398:	4804      	ldr	r0, [pc, #16]	; (80013ac <main+0x4c>)
+ 800139a:	f7ff fb3b 	bl	8000a14 <printmsg>
+		  bootloader_jump_to_user_app();
+ 800139e:	f7ff ffb3 	bl	8001308 <bootloader_jump_to_user_app>
+	  if(HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET)
+ 80013a2:	e7eb      	b.n	800137c <main+0x1c>
+ 80013a4:	40020800 	.word	0x40020800
+ 80013a8:	08004804 	.word	0x08004804
+ 80013ac:	0800483c 	.word	0x0800483c
+
+080013b0 <SystemClock_Config>:
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+ 80013b0:	b580      	push	{r7, lr}
+ 80013b2:	b094      	sub	sp, #80	; 0x50
+ 80013b4:	af00      	add	r7, sp, #0
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+ 80013b6:	f107 0320 	add.w	r3, r7, #32
+ 80013ba:	2230      	movs	r2, #48	; 0x30
+ 80013bc:	2100      	movs	r1, #0
+ 80013be:	4618      	mov	r0, r3
+ 80013c0:	f002 fa9e 	bl	8003900 <memset>
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+ 80013c4:	f107 030c 	add.w	r3, r7, #12
+ 80013c8:	2200      	movs	r2, #0
+ 80013ca:	601a      	str	r2, [r3, #0]
+ 80013cc:	605a      	str	r2, [r3, #4]
+ 80013ce:	609a      	str	r2, [r3, #8]
+ 80013d0:	60da      	str	r2, [r3, #12]
+ 80013d2:	611a      	str	r2, [r3, #16]
+
+  /** Configure the main internal regulator output voltage
+  */
+  __HAL_RCC_PWR_CLK_ENABLE();
+ 80013d4:	2300      	movs	r3, #0
+ 80013d6:	60bb      	str	r3, [r7, #8]
+ 80013d8:	4b29      	ldr	r3, [pc, #164]	; (8001480 <SystemClock_Config+0xd0>)
+ 80013da:	6c1b      	ldr	r3, [r3, #64]	; 0x40
+ 80013dc:	4a28      	ldr	r2, [pc, #160]	; (8001480 <SystemClock_Config+0xd0>)
+ 80013de:	f043 5380 	orr.w	r3, r3, #268435456	; 0x10000000
+ 80013e2:	6413      	str	r3, [r2, #64]	; 0x40
+ 80013e4:	4b26      	ldr	r3, [pc, #152]	; (8001480 <SystemClock_Config+0xd0>)
+ 80013e6:	6c1b      	ldr	r3, [r3, #64]	; 0x40
+ 80013e8:	f003 5380 	and.w	r3, r3, #268435456	; 0x10000000
+ 80013ec:	60bb      	str	r3, [r7, #8]
+ 80013ee:	68bb      	ldr	r3, [r7, #8]
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+ 80013f0:	2300      	movs	r3, #0
+ 80013f2:	607b      	str	r3, [r7, #4]
+ 80013f4:	4b23      	ldr	r3, [pc, #140]	; (8001484 <SystemClock_Config+0xd4>)
+ 80013f6:	681b      	ldr	r3, [r3, #0]
+ 80013f8:	f423 4340 	bic.w	r3, r3, #49152	; 0xc000
+ 80013fc:	4a21      	ldr	r2, [pc, #132]	; (8001484 <SystemClock_Config+0xd4>)
+ 80013fe:	f443 4300 	orr.w	r3, r3, #32768	; 0x8000
+ 8001402:	6013      	str	r3, [r2, #0]
+ 8001404:	4b1f      	ldr	r3, [pc, #124]	; (8001484 <SystemClock_Config+0xd4>)
+ 8001406:	681b      	ldr	r3, [r3, #0]
+ 8001408:	f403 4340 	and.w	r3, r3, #49152	; 0xc000
+ 800140c:	607b      	str	r3, [r7, #4]
+ 800140e:	687b      	ldr	r3, [r7, #4]
+
+  /** Initializes the RCC Oscillators according to the specified parameters
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+ 8001410:	2302      	movs	r3, #2
+ 8001412:	623b      	str	r3, [r7, #32]
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+ 8001414:	2301      	movs	r3, #1
+ 8001416:	62fb      	str	r3, [r7, #44]	; 0x2c
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+ 8001418:	2310      	movs	r3, #16
+ 800141a:	633b      	str	r3, [r7, #48]	; 0x30
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+ 800141c:	2302      	movs	r3, #2
+ 800141e:	63bb      	str	r3, [r7, #56]	; 0x38
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+ 8001420:	2300      	movs	r3, #0
+ 8001422:	63fb      	str	r3, [r7, #60]	; 0x3c
+  RCC_OscInitStruct.PLL.PLLM = 16;
+ 8001424:	2310      	movs	r3, #16
+ 8001426:	643b      	str	r3, [r7, #64]	; 0x40
+  RCC_OscInitStruct.PLL.PLLN = 336;
+ 8001428:	f44f 73a8 	mov.w	r3, #336	; 0x150
+ 800142c:	647b      	str	r3, [r7, #68]	; 0x44
+  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+ 800142e:	2304      	movs	r3, #4
+ 8001430:	64bb      	str	r3, [r7, #72]	; 0x48
+  RCC_OscInitStruct.PLL.PLLQ = 7;
+ 8001432:	2307      	movs	r3, #7
+ 8001434:	64fb      	str	r3, [r7, #76]	; 0x4c
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+ 8001436:	f107 0320 	add.w	r3, r7, #32
+ 800143a:	4618      	mov	r0, r3
+ 800143c:	f001 f93a 	bl	80026b4 <HAL_RCC_OscConfig>
+ 8001440:	4603      	mov	r3, r0
+ 8001442:	2b00      	cmp	r3, #0
+ 8001444:	d001      	beq.n	800144a <SystemClock_Config+0x9a>
+  {
+    Error_Handler();
+ 8001446:	f000 f8f5 	bl	8001634 <Error_Handler>
+  }
+
+  /** Initializes the CPU, AHB and APB buses clocks
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+ 800144a:	230f      	movs	r3, #15
+ 800144c:	60fb      	str	r3, [r7, #12]
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+ 800144e:	2302      	movs	r3, #2
+ 8001450:	613b      	str	r3, [r7, #16]
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+ 8001452:	2300      	movs	r3, #0
+ 8001454:	617b      	str	r3, [r7, #20]
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+ 8001456:	f44f 5380 	mov.w	r3, #4096	; 0x1000
+ 800145a:	61bb      	str	r3, [r7, #24]
+  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+ 800145c:	2300      	movs	r3, #0
+ 800145e:	61fb      	str	r3, [r7, #28]
+
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+ 8001460:	f107 030c 	add.w	r3, r7, #12
+ 8001464:	2102      	movs	r1, #2
+ 8001466:	4618      	mov	r0, r3
+ 8001468:	f001 fb9c 	bl	8002ba4 <HAL_RCC_ClockConfig>
+ 800146c:	4603      	mov	r3, r0
+ 800146e:	2b00      	cmp	r3, #0
+ 8001470:	d001      	beq.n	8001476 <SystemClock_Config+0xc6>
+  {
+    Error_Handler();
+ 8001472:	f000 f8df 	bl	8001634 <Error_Handler>
+  }
+}
+ 8001476:	bf00      	nop
+ 8001478:	3750      	adds	r7, #80	; 0x50
+ 800147a:	46bd      	mov	sp, r7
+ 800147c:	bd80      	pop	{r7, pc}
+ 800147e:	bf00      	nop
+ 8001480:	40023800 	.word	0x40023800
+ 8001484:	40007000 	.word	0x40007000
+
+08001488 <MX_CRC_Init>:
+  * @brief CRC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_CRC_Init(void)
+{
+ 8001488:	b580      	push	{r7, lr}
+ 800148a:	af00      	add	r7, sp, #0
+  /* USER CODE END CRC_Init 0 */
+
+  /* USER CODE BEGIN CRC_Init 1 */
+
+  /* USER CODE END CRC_Init 1 */
+  hcrc.Instance = CRC;
+ 800148c:	4b06      	ldr	r3, [pc, #24]	; (80014a8 <MX_CRC_Init+0x20>)
+ 800148e:	4a07      	ldr	r2, [pc, #28]	; (80014ac <MX_CRC_Init+0x24>)
+ 8001490:	601a      	str	r2, [r3, #0]
+  if (HAL_CRC_Init(&hcrc) != HAL_OK)
+ 8001492:	4805      	ldr	r0, [pc, #20]	; (80014a8 <MX_CRC_Init+0x20>)
+ 8001494:	f000 fb8d 	bl	8001bb2 <HAL_CRC_Init>
+ 8001498:	4603      	mov	r3, r0
+ 800149a:	2b00      	cmp	r3, #0
+ 800149c:	d001      	beq.n	80014a2 <MX_CRC_Init+0x1a>
+  {
+    Error_Handler();
+ 800149e:	f000 f8c9 	bl	8001634 <Error_Handler>
+  }
+  /* USER CODE BEGIN CRC_Init 2 */
+
+  /* USER CODE END CRC_Init 2 */
+
+}
+ 80014a2:	bf00      	nop
+ 80014a4:	bd80      	pop	{r7, pc}
+ 80014a6:	bf00      	nop
+ 80014a8:	20000160 	.word	0x20000160
+ 80014ac:	40023000 	.word	0x40023000
+
+080014b0 <MX_USART1_UART_Init>:
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+ 80014b0:	b580      	push	{r7, lr}
+ 80014b2:	af00      	add	r7, sp, #0
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+ 80014b4:	4b11      	ldr	r3, [pc, #68]	; (80014fc <MX_USART1_UART_Init+0x4c>)
+ 80014b6:	4a12      	ldr	r2, [pc, #72]	; (8001500 <MX_USART1_UART_Init+0x50>)
+ 80014b8:	601a      	str	r2, [r3, #0]
+  huart1.Init.BaudRate = 115200;
+ 80014ba:	4b10      	ldr	r3, [pc, #64]	; (80014fc <MX_USART1_UART_Init+0x4c>)
+ 80014bc:	f44f 32e1 	mov.w	r2, #115200	; 0x1c200
+ 80014c0:	605a      	str	r2, [r3, #4]
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+ 80014c2:	4b0e      	ldr	r3, [pc, #56]	; (80014fc <MX_USART1_UART_Init+0x4c>)
+ 80014c4:	2200      	movs	r2, #0
+ 80014c6:	609a      	str	r2, [r3, #8]
+  huart1.Init.StopBits = UART_STOPBITS_1;
+ 80014c8:	4b0c      	ldr	r3, [pc, #48]	; (80014fc <MX_USART1_UART_Init+0x4c>)
+ 80014ca:	2200      	movs	r2, #0
+ 80014cc:	60da      	str	r2, [r3, #12]
+  huart1.Init.Parity = UART_PARITY_NONE;
+ 80014ce:	4b0b      	ldr	r3, [pc, #44]	; (80014fc <MX_USART1_UART_Init+0x4c>)
+ 80014d0:	2200      	movs	r2, #0
+ 80014d2:	611a      	str	r2, [r3, #16]
+  huart1.Init.Mode = UART_MODE_TX_RX;
+ 80014d4:	4b09      	ldr	r3, [pc, #36]	; (80014fc <MX_USART1_UART_Init+0x4c>)
+ 80014d6:	220c      	movs	r2, #12
+ 80014d8:	615a      	str	r2, [r3, #20]
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 80014da:	4b08      	ldr	r3, [pc, #32]	; (80014fc <MX_USART1_UART_Init+0x4c>)
+ 80014dc:	2200      	movs	r2, #0
+ 80014de:	619a      	str	r2, [r3, #24]
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+ 80014e0:	4b06      	ldr	r3, [pc, #24]	; (80014fc <MX_USART1_UART_Init+0x4c>)
+ 80014e2:	2200      	movs	r2, #0
+ 80014e4:	61da      	str	r2, [r3, #28]
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+ 80014e6:	4805      	ldr	r0, [pc, #20]	; (80014fc <MX_USART1_UART_Init+0x4c>)
+ 80014e8:	f001 fd7c 	bl	8002fe4 <HAL_UART_Init>
+ 80014ec:	4603      	mov	r3, r0
+ 80014ee:	2b00      	cmp	r3, #0
+ 80014f0:	d001      	beq.n	80014f6 <MX_USART1_UART_Init+0x46>
+  {
+    Error_Handler();
+ 80014f2:	f000 f89f 	bl	8001634 <Error_Handler>
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+ 80014f6:	bf00      	nop
+ 80014f8:	bd80      	pop	{r7, pc}
+ 80014fa:	bf00      	nop
+ 80014fc:	20000168 	.word	0x20000168
+ 8001500:	40011000 	.word	0x40011000
+
+08001504 <MX_USART2_UART_Init>:
+  * @brief USART2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART2_UART_Init(void)
+{
+ 8001504:	b580      	push	{r7, lr}
+ 8001506:	af00      	add	r7, sp, #0
+  /* USER CODE END USART2_Init 0 */
+
+  /* USER CODE BEGIN USART2_Init 1 */
+
+  /* USER CODE END USART2_Init 1 */
+  huart2.Instance = USART2;
+ 8001508:	4b11      	ldr	r3, [pc, #68]	; (8001550 <MX_USART2_UART_Init+0x4c>)
+ 800150a:	4a12      	ldr	r2, [pc, #72]	; (8001554 <MX_USART2_UART_Init+0x50>)
+ 800150c:	601a      	str	r2, [r3, #0]
+  huart2.Init.BaudRate = 115200;
+ 800150e:	4b10      	ldr	r3, [pc, #64]	; (8001550 <MX_USART2_UART_Init+0x4c>)
+ 8001510:	f44f 32e1 	mov.w	r2, #115200	; 0x1c200
+ 8001514:	605a      	str	r2, [r3, #4]
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+ 8001516:	4b0e      	ldr	r3, [pc, #56]	; (8001550 <MX_USART2_UART_Init+0x4c>)
+ 8001518:	2200      	movs	r2, #0
+ 800151a:	609a      	str	r2, [r3, #8]
+  huart2.Init.StopBits = UART_STOPBITS_1;
+ 800151c:	4b0c      	ldr	r3, [pc, #48]	; (8001550 <MX_USART2_UART_Init+0x4c>)
+ 800151e:	2200      	movs	r2, #0
+ 8001520:	60da      	str	r2, [r3, #12]
+  huart2.Init.Parity = UART_PARITY_NONE;
+ 8001522:	4b0b      	ldr	r3, [pc, #44]	; (8001550 <MX_USART2_UART_Init+0x4c>)
+ 8001524:	2200      	movs	r2, #0
+ 8001526:	611a      	str	r2, [r3, #16]
+  huart2.Init.Mode = UART_MODE_TX_RX;
+ 8001528:	4b09      	ldr	r3, [pc, #36]	; (8001550 <MX_USART2_UART_Init+0x4c>)
+ 800152a:	220c      	movs	r2, #12
+ 800152c:	615a      	str	r2, [r3, #20]
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+ 800152e:	4b08      	ldr	r3, [pc, #32]	; (8001550 <MX_USART2_UART_Init+0x4c>)
+ 8001530:	2200      	movs	r2, #0
+ 8001532:	619a      	str	r2, [r3, #24]
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+ 8001534:	4b06      	ldr	r3, [pc, #24]	; (8001550 <MX_USART2_UART_Init+0x4c>)
+ 8001536:	2200      	movs	r2, #0
+ 8001538:	61da      	str	r2, [r3, #28]
+  if (HAL_UART_Init(&huart2) != HAL_OK)
+ 800153a:	4805      	ldr	r0, [pc, #20]	; (8001550 <MX_USART2_UART_Init+0x4c>)
+ 800153c:	f001 fd52 	bl	8002fe4 <HAL_UART_Init>
+ 8001540:	4603      	mov	r3, r0
+ 8001542:	2b00      	cmp	r3, #0
+ 8001544:	d001      	beq.n	800154a <MX_USART2_UART_Init+0x46>
+  {
+    Error_Handler();
+ 8001546:	f000 f875 	bl	8001634 <Error_Handler>
+  }
+  /* USER CODE BEGIN USART2_Init 2 */
+
+  /* USER CODE END USART2_Init 2 */
+
+}
+ 800154a:	bf00      	nop
+ 800154c:	bd80      	pop	{r7, pc}
+ 800154e:	bf00      	nop
+ 8001550:	200001ac 	.word	0x200001ac
+ 8001554:	40004400 	.word	0x40004400
+
+08001558 <MX_GPIO_Init>:
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_GPIO_Init(void)
+{
+ 8001558:	b580      	push	{r7, lr}
+ 800155a:	b08a      	sub	sp, #40	; 0x28
+ 800155c:	af00      	add	r7, sp, #0
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+ 800155e:	f107 0314 	add.w	r3, r7, #20
+ 8001562:	2200      	movs	r2, #0
+ 8001564:	601a      	str	r2, [r3, #0]
+ 8001566:	605a      	str	r2, [r3, #4]
+ 8001568:	609a      	str	r2, [r3, #8]
+ 800156a:	60da      	str	r2, [r3, #12]
+ 800156c:	611a      	str	r2, [r3, #16]
+
+  /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
+ 800156e:	2300      	movs	r3, #0
+ 8001570:	613b      	str	r3, [r7, #16]
+ 8001572:	4b2d      	ldr	r3, [pc, #180]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 8001574:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+ 8001576:	4a2c      	ldr	r2, [pc, #176]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 8001578:	f043 0304 	orr.w	r3, r3, #4
+ 800157c:	6313      	str	r3, [r2, #48]	; 0x30
+ 800157e:	4b2a      	ldr	r3, [pc, #168]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 8001580:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+ 8001582:	f003 0304 	and.w	r3, r3, #4
+ 8001586:	613b      	str	r3, [r7, #16]
+ 8001588:	693b      	ldr	r3, [r7, #16]
+  __HAL_RCC_GPIOH_CLK_ENABLE();
+ 800158a:	2300      	movs	r3, #0
+ 800158c:	60fb      	str	r3, [r7, #12]
+ 800158e:	4b26      	ldr	r3, [pc, #152]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 8001590:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+ 8001592:	4a25      	ldr	r2, [pc, #148]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 8001594:	f043 0380 	orr.w	r3, r3, #128	; 0x80
+ 8001598:	6313      	str	r3, [r2, #48]	; 0x30
+ 800159a:	4b23      	ldr	r3, [pc, #140]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 800159c:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+ 800159e:	f003 0380 	and.w	r3, r3, #128	; 0x80
+ 80015a2:	60fb      	str	r3, [r7, #12]
+ 80015a4:	68fb      	ldr	r3, [r7, #12]
+  __HAL_RCC_GPIOA_CLK_ENABLE();
+ 80015a6:	2300      	movs	r3, #0
+ 80015a8:	60bb      	str	r3, [r7, #8]
+ 80015aa:	4b1f      	ldr	r3, [pc, #124]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 80015ac:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+ 80015ae:	4a1e      	ldr	r2, [pc, #120]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 80015b0:	f043 0301 	orr.w	r3, r3, #1
+ 80015b4:	6313      	str	r3, [r2, #48]	; 0x30
+ 80015b6:	4b1c      	ldr	r3, [pc, #112]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 80015b8:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+ 80015ba:	f003 0301 	and.w	r3, r3, #1
+ 80015be:	60bb      	str	r3, [r7, #8]
+ 80015c0:	68bb      	ldr	r3, [r7, #8]
+  __HAL_RCC_GPIOB_CLK_ENABLE();
+ 80015c2:	2300      	movs	r3, #0
+ 80015c4:	607b      	str	r3, [r7, #4]
+ 80015c6:	4b18      	ldr	r3, [pc, #96]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 80015c8:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+ 80015ca:	4a17      	ldr	r2, [pc, #92]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 80015cc:	f043 0302 	orr.w	r3, r3, #2
+ 80015d0:	6313      	str	r3, [r2, #48]	; 0x30
+ 80015d2:	4b15      	ldr	r3, [pc, #84]	; (8001628 <MX_GPIO_Init+0xd0>)
+ 80015d4:	6b1b      	ldr	r3, [r3, #48]	; 0x30
+ 80015d6:	f003 0302 	and.w	r3, r3, #2
+ 80015da:	607b      	str	r3, [r7, #4]
+ 80015dc:	687b      	ldr	r3, [r7, #4]
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+ 80015de:	2200      	movs	r2, #0
+ 80015e0:	2120      	movs	r1, #32
+ 80015e2:	4812      	ldr	r0, [pc, #72]	; (800162c <MX_GPIO_Init+0xd4>)
+ 80015e4:	f001 f84c 	bl	8002680 <HAL_GPIO_WritePin>
+
+  /*Configure GPIO pin : B1_Pin */
+  GPIO_InitStruct.Pin = B1_Pin;
+ 80015e8:	f44f 5300 	mov.w	r3, #8192	; 0x2000
+ 80015ec:	617b      	str	r3, [r7, #20]
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
+ 80015ee:	f44f 1304 	mov.w	r3, #2162688	; 0x210000
+ 80015f2:	61bb      	str	r3, [r7, #24]
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 80015f4:	2300      	movs	r3, #0
+ 80015f6:	61fb      	str	r3, [r7, #28]
+  HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
+ 80015f8:	f107 0314 	add.w	r3, r7, #20
+ 80015fc:	4619      	mov	r1, r3
+ 80015fe:	480c      	ldr	r0, [pc, #48]	; (8001630 <MX_GPIO_Init+0xd8>)
+ 8001600:	f000 fea2 	bl	8002348 <HAL_GPIO_Init>
+
+  /*Configure GPIO pin : LD2_Pin */
+  GPIO_InitStruct.Pin = LD2_Pin;
+ 8001604:	2320      	movs	r3, #32
+ 8001606:	617b      	str	r3, [r7, #20]
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+ 8001608:	2301      	movs	r3, #1
+ 800160a:	61bb      	str	r3, [r7, #24]
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+ 800160c:	2300      	movs	r3, #0
+ 800160e:	61fb      	str	r3, [r7, #28]
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+ 8001610:	2300      	movs	r3, #0
+ 8001612:	623b      	str	r3, [r7, #32]
+  HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+ 8001614:	f107 0314 	add.w	r3, r7, #20
+ 8001618:	4619      	mov	r1, r3
+ 800161a:	4804      	ldr	r0, [pc, #16]	; (800162c <MX_GPIO_Init+0xd4>)
+ 800161c:	f000 fe94 	bl	8002348 <HAL_GPIO_Init>
+
+}
+ 8001620:	bf00      	nop
+ 8001622:	3728      	adds	r7, #40	; 0x28
+ 8001624:	46bd      	mov	sp, r7
+ 8001626:	bd80      	pop	{r7, pc}
+ 8001628:	40023800 	.word	0x40023800
+ 800162c:	40020000 	.word	0x40020000
+ 8001630:	40020800 	.word	0x40020800
 
 08001634 <Error_Handler>:
 /**
@@ -3890,7 +3890,7 @@ LoopFillZerobss:
  80018de:	f001 ffeb 	bl	80038b8 <__libc_init_array>
 /* Call the application's entry point.*/
   bl  main
- 80018e2:	f7fe fe57 	bl	8000594 <main>
+ 80018e2:	f7ff fd3d 	bl	8001360 <main>
   bx  lr    
  80018e6:	4770      	bx	lr
   ldr   sp, =_estack    		 /* set stack pointer */
